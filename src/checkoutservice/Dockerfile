@@ -25,12 +25,16 @@ COPY . .
 
 # Skaffold passes in debug-oriented compiler flags
 ARG SKAFFOLD_GO_GCFLAGS
-RUN go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /checkoutservice .
+#RUN go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /checkoutservice .
+#RUN GOOS=linux GOARCH=arm GOARM=7 go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /checkoutservice .
+RUN GOOS=linux GOARCH=arm64 go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /checkoutservice .
 
-FROM alpine as release
+#FROM alpine as release
+FROM arm64v8/alpine as release
+
 RUN apk add --no-cache ca-certificates
 RUN GRPC_HEALTH_PROBE_VERSION=v0.4.6 && \
-    wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
+    wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-arm && \
     chmod +x /bin/grpc_health_probe
 WORKDIR /src
 COPY --from=builder /checkoutservice /src/checkoutservice

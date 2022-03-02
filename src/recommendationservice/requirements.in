@@ -1,5 +1,5 @@
 google-api-core==1.23.0
-google-python-cloud-debugger==2.18
+#google-python-cloud-debugger==2.18
 google-cloud-profiler==3.0.7
 grpcio-health-checking==1.33.2
 grpcio==1.33.2

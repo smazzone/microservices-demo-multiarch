@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM python:3.8-slim as base
+#FROM python:3.8-slim as base
+FROM arm64v8/python:3.8-slim  as base
 
 FROM base as builder
 

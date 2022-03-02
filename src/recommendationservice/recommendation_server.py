@@ -20,7 +20,7 @@ import time
 import traceback
 from concurrent import futures
 
-import googleclouddebugger
+#import googleclouddebugger
 import googlecloudprofiler
 from google.auth.exceptions import DefaultCredentialsError
 import grpc
@@ -124,15 +124,15 @@ if __name__ == "__main__":
         raise KeyError()
       else:
         logger.info("Debugger enabled.")
-        try:
-          googleclouddebugger.enable(
-              module='recommendationserver',
-              version='1.0.0'
-          )
-        except (Exception, DefaultCredentialsError):
-            logger.error("Could not enable debugger")
-            logger.error(traceback.print_exc())
-            pass
+        #try:
+          #googleclouddebugger.enable(
+          #    module='recommendationserver',
+          #    version='1.0.0'
+          #)
+        #except (Exception, DefaultCredentialsError):
+            #logger.error("Could not enable debugger")
+            #logger.error(traceback.print_exc())
+            #pass
     except (Exception, DefaultCredentialsError):
         logger.info("Debugger disabled.")
 

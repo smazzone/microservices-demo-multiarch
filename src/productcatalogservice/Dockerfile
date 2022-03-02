@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM golang:1.17.7-alpine AS builder
+#FROM golang:1.17.7-alpine AS builder
+FROM arm64v8/golang:1.17.7-alpine as builder
 RUN apk add --no-cache ca-certificates git
 RUN apk add build-base
 
@@ -24,12 +25,17 @@ COPY . .
 
 # Skaffold passes in debug-oriented compiler flags
 ARG SKAFFOLD_GO_GCFLAGS
-RUN go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /productcatalogservice .
+#RUN go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /productcatalogservice .
+#RUN GOOS=linux GOARCH=arm GOARM=7 go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /productcatalogservice .
+RUN GOOS=linux GOARCH=arm64 go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /productcatalogservice .
 
-FROM alpine AS release
+
+#FROM alpine AS release
+FROM arm64v8/alpine as release
+
 RUN apk add --no-cache ca-certificates
 RUN GRPC_HEALTH_PROBE_VERSION=v0.4.6 && \
-    wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
+    wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-arm64 && \
     chmod +x /bin/grpc_health_probe
 WORKDIR /src
 COPY --from=builder /productcatalogservice ./server

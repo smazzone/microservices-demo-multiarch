@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM python:3.7-slim as base
+#FROM python:3.7-slim as base
+FROM arm64v8/python:3.7-slim as base
 
 FROM base as builder
 
@@ -37,7 +38,7 @@ RUN apt-get -qq update \
 
 # Download the grpc health probe
 RUN GRPC_HEALTH_PROBE_VERSION=v0.4.6 && \
-    wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
+    wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-arm64 && \
     chmod +x /bin/grpc_health_probe
 
 WORKDIR /email_server
