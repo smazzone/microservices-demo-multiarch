@@ -16,6 +16,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: recommendationservice
+  labels:
+    tags.datadoghq.com/env: "dev"
+    tags.datadoghq.com/service: "recommendationservice"
+    tags.datadoghq.com/version: "1.0"
 spec:
   selector:
     matchLabels:
@@ -24,22 +28,32 @@ spec:
     metadata:
       labels:
         app: recommendationservice
+        tags.datadoghq.com/env: "dev"
+        tags.datadoghq.com/service: "recommendationservice"
+        tags.datadoghq.com/version: "1.0"
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
+      volumes:
+        - hostPath:
+            path: /var/run/datadog/
+          name: apmsocketpath
       containers:
       - name: server
         image: recommendationservice
+        volumeMounts:
+          - name: apmsocketpath
+            mountPath: /var/run/datadog
         ports:
         - containerPort: 8080
-        readinessProbe:
-          periodSeconds: 5
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:8080"]
-        livenessProbe:
-          periodSeconds: 5
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:8080"]
+        # readinessProbe:
+        #   periodSeconds: 5
+        #   exec:
+        #     command: ["/bin/grpc_health_probe", "-addr=:8080"]
+        # livenessProbe:
+        #   periodSeconds: 5
+        #   exec:
+        #     command: ["/bin/grpc_health_probe", "-addr=:8080"]
         env:
         - name: PORT
           value: "8080"
@@ -51,6 +65,28 @@ spec:
           value: "1"
         - name: DISABLE_DEBUGGER
           value: "1"
+        - name: DD_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: DD_ENV
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/env']
+        - name: DD_SERVICE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/service']
+        - name: DD_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/version']
+        - name: DD_PROFILING_ENABLED
+          value: "true"
+        - name: DD_LOGS_INJECTION
+          value: "true"
+        - name: DD_TRACE_SAMPLE_RATE
+          value: "1"        
         resources:
           requests:
             cpu: 100m

@@ -21,7 +21,12 @@ import (
 	"os"
 	"time"
 
-	"cloud.google.com/go/profiler"
+	grpctrace "gopkg.in/DataDog/dd-trace-go.v1/contrib/google.golang.org/grpc"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
+	"gopkg.in/DataDog/dd-trace-go.v1/profiler"
+
+	profilerold "cloud.google.com/go/profiler"
+
 	"contrib.go.opencensus.io/exporter/jaeger"
 	"contrib.go.opencensus.io/exporter/stackdriver"
 	"github.com/google/uuid"
@@ -69,6 +74,25 @@ type checkoutService struct {
 }
 
 func main() {
+
+	tracer.Start(tracer.WithRuntimeMetrics())
+	err := profiler.Start(
+		profiler.WithProfileTypes(
+			profiler.CPUProfile,
+			profiler.HeapProfile,
+
+			// The profiles below are disabled by
+			// default to keep overhead low, but
+			// can be enabled as needed.
+			// profiler.BlockProfile,
+			// profiler.MutexProfile,
+			// profiler.GoroutineProfile,
+		),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	if os.Getenv("DISABLE_TRACING") == "" {
 		log.Info("Tracing enabled.")
 		go initTracing()
@@ -96,26 +120,32 @@ func main() {
 	mustMapEnv(&svc.emailSvcAddr, "EMAIL_SERVICE_ADDR")
 	mustMapEnv(&svc.paymentSvcAddr, "PAYMENT_SERVICE_ADDR")
 
-	log.Infof("service config: %+v", svc)
+	log.Info("service config: %+v", svc)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// Create the server interceptor using the grpc trace package.
+	si := grpctrace.StreamServerInterceptor()
+	ui := grpctrace.UnaryServerInterceptor()
+
 	var srv *grpc.Server
 	if os.Getenv("DISABLE_STATS") == "" {
 		log.Info("Stats enabled.")
-		srv = grpc.NewServer(grpc.StatsHandler(&ocgrpc.ServerHandler{}))
+		srv = grpc.NewServer(grpc.StatsHandler(&ocgrpc.ServerHandler{}), grpc.StreamInterceptor(si), grpc.UnaryInterceptor(ui))
 	} else {
 		log.Info("Stats disabled.")
-		srv = grpc.NewServer()
+		srv = grpc.NewServer(grpc.StreamInterceptor(si), grpc.UnaryInterceptor(ui))
 	}
 	pb.RegisterCheckoutServiceServer(srv, svc)
 	healthpb.RegisterHealthServer(srv, svc)
 	log.Infof("starting to listen on tcp: %q", lis.Addr().String())
 	err = srv.Serve(lis)
 	log.Fatal(err)
+	defer tracer.Stop()
+	defer profiler.Stop()
 }
 
 func initJaegerTracing() {
@@ -181,7 +211,7 @@ func initProfiling(service, version string) {
 	// TODO(ahmetb) this method is duplicated in other microservices using Go
 	// since they are not sharing packages.
 	for i := 1; i <= 3; i++ {
-		if err := profiler.Start(profiler.Config{
+		if err := profilerold.Start(profilerold.Config{
 			Service:        service,
 			ServiceVersion: version,
 			// ProjectID must be set if not running on GCP.
@@ -299,9 +329,12 @@ func (cs *checkoutService) prepareOrderItemsAndShippingQuoteFromCart(ctx context
 }
 
 func (cs *checkoutService) quoteShipping(ctx context.Context, address *pb.Address, items []*pb.CartItem) (*pb.Money, error) {
+	// Create the client interceptor using the grpc trace package.
+	si := grpctrace.StreamClientInterceptor()
+	ui := grpctrace.UnaryClientInterceptor()
 	conn, err := grpc.DialContext(ctx, cs.shippingSvcAddr,
 		grpc.WithInsecure(),
-		grpc.WithStatsHandler(&ocgrpc.ClientHandler{}))
+		grpc.WithStatsHandler(&ocgrpc.ClientHandler{}), grpc.WithStreamInterceptor(si), grpc.WithUnaryInterceptor(ui))
 	if err != nil {
 		return nil, fmt.Errorf("could not connect shipping service: %+v", err)
 	}
@@ -318,7 +351,10 @@ func (cs *checkoutService) quoteShipping(ctx context.Context, address *pb.Addres
 }
 
 func (cs *checkoutService) getUserCart(ctx context.Context, userID string) ([]*pb.CartItem, error) {
-	conn, err := grpc.DialContext(ctx, cs.cartSvcAddr, grpc.WithInsecure(), grpc.WithStatsHandler(&ocgrpc.ClientHandler{}))
+	// Create the client interceptor using the grpc trace package.
+	si := grpctrace.StreamClientInterceptor()
+	ui := grpctrace.UnaryClientInterceptor()
+	conn, err := grpc.DialContext(ctx, cs.cartSvcAddr, grpc.WithInsecure(), grpc.WithStatsHandler(&ocgrpc.ClientHandler{}), grpc.WithStreamInterceptor(si), grpc.WithUnaryInterceptor(ui))
 	if err != nil {
 		return nil, fmt.Errorf("could not connect cart service: %+v", err)
 	}
@@ -332,7 +368,10 @@ func (cs *checkoutService) getUserCart(ctx context.Context, userID string) ([]*p
 }
 
 func (cs *checkoutService) emptyUserCart(ctx context.Context, userID string) error {
-	conn, err := grpc.DialContext(ctx, cs.cartSvcAddr, grpc.WithInsecure(), grpc.WithStatsHandler(&ocgrpc.ClientHandler{}))
+	// Create the client interceptor using the grpc trace package.
+	si := grpctrace.StreamClientInterceptor()
+	ui := grpctrace.UnaryClientInterceptor()
+	conn, err := grpc.DialContext(ctx, cs.cartSvcAddr, grpc.WithInsecure(), grpc.WithStatsHandler(&ocgrpc.ClientHandler{}), grpc.WithStreamInterceptor(si), grpc.WithUnaryInterceptor(ui))
 	if err != nil {
 		return fmt.Errorf("could not connect cart service: %+v", err)
 	}
@@ -345,9 +384,12 @@ func (cs *checkoutService) emptyUserCart(ctx context.Context, userID string) err
 }
 
 func (cs *checkoutService) prepOrderItems(ctx context.Context, items []*pb.CartItem, userCurrency string) ([]*pb.OrderItem, error) {
+	// Create the client interceptor using the grpc trace package.
+	si := grpctrace.StreamClientInterceptor()
+	ui := grpctrace.UnaryClientInterceptor()
 	out := make([]*pb.OrderItem, len(items))
 
-	conn, err := grpc.DialContext(ctx, cs.productCatalogSvcAddr, grpc.WithInsecure(), grpc.WithStatsHandler(&ocgrpc.ClientHandler{}))
+	conn, err := grpc.DialContext(ctx, cs.productCatalogSvcAddr, grpc.WithInsecure(), grpc.WithStatsHandler(&ocgrpc.ClientHandler{}), grpc.WithStreamInterceptor(si), grpc.WithUnaryInterceptor(ui))
 	if err != nil {
 		return nil, fmt.Errorf("could not connect product catalog service: %+v", err)
 	}
@@ -371,7 +413,10 @@ func (cs *checkoutService) prepOrderItems(ctx context.Context, items []*pb.CartI
 }
 
 func (cs *checkoutService) convertCurrency(ctx context.Context, from *pb.Money, toCurrency string) (*pb.Money, error) {
-	conn, err := grpc.DialContext(ctx, cs.currencySvcAddr, grpc.WithInsecure(), grpc.WithStatsHandler(&ocgrpc.ClientHandler{}))
+	// Create the client interceptor using the grpc trace package.
+	si := grpctrace.StreamClientInterceptor()
+	ui := grpctrace.UnaryClientInterceptor()
+	conn, err := grpc.DialContext(ctx, cs.currencySvcAddr, grpc.WithInsecure(), grpc.WithStatsHandler(&ocgrpc.ClientHandler{}), grpc.WithStreamInterceptor(si), grpc.WithUnaryInterceptor(ui))
 	if err != nil {
 		return nil, fmt.Errorf("could not connect currency service: %+v", err)
 	}
@@ -386,7 +431,10 @@ func (cs *checkoutService) convertCurrency(ctx context.Context, from *pb.Money, 
 }
 
 func (cs *checkoutService) chargeCard(ctx context.Context, amount *pb.Money, paymentInfo *pb.CreditCardInfo) (string, error) {
-	conn, err := grpc.DialContext(ctx, cs.paymentSvcAddr, grpc.WithInsecure(), grpc.WithStatsHandler(&ocgrpc.ClientHandler{}))
+	// Create the client interceptor using the grpc trace package.
+	si := grpctrace.StreamClientInterceptor()
+	ui := grpctrace.UnaryClientInterceptor()
+	conn, err := grpc.DialContext(ctx, cs.paymentSvcAddr, grpc.WithInsecure(), grpc.WithStatsHandler(&ocgrpc.ClientHandler{}), grpc.WithStreamInterceptor(si), grpc.WithUnaryInterceptor(ui))
 	if err != nil {
 		return "", fmt.Errorf("failed to connect payment service: %+v", err)
 	}
@@ -402,7 +450,10 @@ func (cs *checkoutService) chargeCard(ctx context.Context, amount *pb.Money, pay
 }
 
 func (cs *checkoutService) sendOrderConfirmation(ctx context.Context, email string, order *pb.OrderResult) error {
-	conn, err := grpc.DialContext(ctx, cs.emailSvcAddr, grpc.WithInsecure(), grpc.WithStatsHandler(&ocgrpc.ClientHandler{}))
+	// Create the client interceptor using the grpc trace package.
+	si := grpctrace.StreamClientInterceptor()
+	ui := grpctrace.UnaryClientInterceptor()
+	conn, err := grpc.DialContext(ctx, cs.emailSvcAddr, grpc.WithInsecure(), grpc.WithStatsHandler(&ocgrpc.ClientHandler{}), grpc.WithStreamInterceptor(si), grpc.WithUnaryInterceptor(ui))
 	if err != nil {
 		return fmt.Errorf("failed to connect email service: %+v", err)
 	}
@@ -414,7 +465,10 @@ func (cs *checkoutService) sendOrderConfirmation(ctx context.Context, email stri
 }
 
 func (cs *checkoutService) shipOrder(ctx context.Context, address *pb.Address, items []*pb.CartItem) (string, error) {
-	conn, err := grpc.DialContext(ctx, cs.shippingSvcAddr, grpc.WithInsecure(), grpc.WithStatsHandler(&ocgrpc.ClientHandler{}))
+	// Create the client interceptor using the grpc trace package.
+	si := grpctrace.StreamClientInterceptor()
+	ui := grpctrace.UnaryClientInterceptor()
+	conn, err := grpc.DialContext(ctx, cs.shippingSvcAddr, grpc.WithInsecure(), grpc.WithStatsHandler(&ocgrpc.ClientHandler{}), grpc.WithStreamInterceptor(si), grpc.WithUnaryInterceptor(ui))
 	if err != nil {
 		return "", fmt.Errorf("failed to connect email service: %+v", err)
 	}

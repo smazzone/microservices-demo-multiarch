@@ -16,6 +16,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: currencyservice
+  labels:
+    tags.datadoghq.com/env: "dev"
+    tags.datadoghq.com/service: "currencyservice"
+    tags.datadoghq.com/version: "1.0"
 spec:
   selector:
     matchLabels:
@@ -24,9 +28,16 @@ spec:
     metadata:
       labels:
         app: currencyservice
+        tags.datadoghq.com/env: "dev"
+        tags.datadoghq.com/service: "currencyservice"
+        tags.datadoghq.com/version: "1.0"
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
+      volumes:
+        - hostPath:
+            path: /var/run/datadog/
+          name: apmsocketpath
       containers:
       - name: server
         image: currencyservice
@@ -42,12 +53,35 @@ spec:
           value: "1"
         - name: DISABLE_DEBUGGER
           value: "1"
-        readinessProbe:
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:7000"]
-        livenessProbe:
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:7000"]
+        - name: DD_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: DD_ENV
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/env']
+        - name: DD_SERVICE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/service']
+        - name: DD_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/version']
+        - name: DD_LOGS_INJECTION
+          value: "true"
+        - name: DD_TRACE_SAMPLE_RATE
+          value: "1"
+        - name: DD_PROFILING_ENABLED
+          value: "true"
+        #this is needed to make it work on docker desktop on M1
+        # readinessProbe:
+        #   exec:
+        #     command: ["/bin/grpc_health_probe", "-addr=:7000"]
+        # livenessProbe:
+        #   exec:
+        #     command: ["/bin/grpc_health_probe", "-addr=:7000"]
         resources:
           requests:
             cpu: 100m

@@ -16,6 +16,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
+  labels:
+    tags.datadoghq.com/env: "dev"
+    tags.datadoghq.com/service: "frontend"
+    tags.datadoghq.com/version: "1.0"
 spec:
   selector:
     matchLabels:
@@ -24,13 +28,23 @@ spec:
     metadata:
       labels:
         app: frontend
+        tags.datadoghq.com/env: "dev"
+        tags.datadoghq.com/service: "frontend"
+        tags.datadoghq.com/version: "1.0"
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "true"
     spec:
       serviceAccountName: default
+      volumes:
+        - hostPath:
+            path: /var/run/datadog/
+          name: apmsocketpath
       containers:
         - name: server
           image: frontend
+          volumeMounts:
+            - name: apmsocketpath
+              mountPath: /var/run/datadog
           ports:
           - containerPort: 8080
           readinessProbe:
@@ -78,6 +92,24 @@ spec:
           #   value: "jaeger-collector:14268"
           # - name: CYMBAL_BRANDING
           #   value: "true"
+          - name: DD_AGENT_HOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+          - name: DD_ENV
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['tags.datadoghq.com/env']
+          - name: DD_SERVICE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['tags.datadoghq.com/service']
+          - name: DD_VERSION
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['tags.datadoghq.com/version']
+          - name: DD_TRACE_SAMPLE_RATE
+            value: "1"                 
           resources:
             requests:
               cpu: 100m

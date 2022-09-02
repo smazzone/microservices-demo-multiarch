@@ -16,6 +16,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: adservice
+  labels:
+      tags.datadoghq.com/env: "dev"
+      tags.datadoghq.com/service: "adservice"
+      tags.datadoghq.com/version: "1.0"  
 spec:
   selector:
     matchLabels:
@@ -24,12 +28,22 @@ spec:
     metadata:
       labels:
         app: adservice
+        tags.datadoghq.com/env: "dev"
+        tags.datadoghq.com/service: "adservice"
+        tags.datadoghq.com/version: "1.0"  
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
+      volumes:
+        - hostPath:
+            path: /var/run/datadog/
+          name: apmsocketpath
       containers:
       - name: server
         image: adservice
+        volumeMounts:
+          - name: apmsocketpath
+            mountPath: /var/run/datadog
         ports:
         - containerPort: 9555
         env:
@@ -41,6 +55,24 @@ spec:
           value: "1"
         # - name: JAEGER_SERVICE_ADDR
         #   value: "jaeger-collector:14268"
+        - name: DD_ENV
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/env']
+        - name: DD_SERVICE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/service']
+        - name: DD_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/version']        
+        - name: DD_PROFILING_ENABLED
+          value: "true"
+        - name: DD_LOGS_INJECTION
+          value: "true"
+        - name: DD_TRACE_SAMPLE_RATE
+          value: "1"
         resources:
           requests:
             cpu: 200m
@@ -48,16 +80,16 @@ spec:
           limits:
             cpu: 300m
             memory: 300Mi
-        readinessProbe:
-          initialDelaySeconds: 20
-          periodSeconds: 15
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:9555"]
-        livenessProbe:
-          initialDelaySeconds: 20
-          periodSeconds: 15
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:9555"]
+        # readinessProbe:
+        #   initialDelaySeconds: 20
+        #   periodSeconds: 15
+        #   exec:
+        #     command: ["/bin/grpc_health_probe", "-addr=:9555"]
+        # livenessProbe:
+        #   initialDelaySeconds: 20
+        #   periodSeconds: 15
+        #   exec:
+        #     command: ["/bin/grpc_health_probe", "-addr=:9555"]
 ---
 apiVersion: v1
 kind: Service

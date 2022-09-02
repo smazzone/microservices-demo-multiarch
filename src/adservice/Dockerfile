@@ -33,12 +33,22 @@ FROM arm64v8/openjdk:8-slim
 RUN apt-get -y update && apt-get install -qqy \
     wget \
     && rm -rf /var/lib/apt/lists/*
+
+# download ps for throubleshooting
+#RUN apt-get update && apt-get install -y \
+#    procps \
+#    && rm -rf /var/lib/apt/lists/*
+
 #RUN mkdir -p /opt/cprof && \
 #    wget -q -O- https://storage.googleapis.com/cloud-profiler/java/latest/profiler_java_agent.tar.gz \
 #    | tar xzv -C /opt/cprof && \
 #    rm -rf profiler_java_agent.tar.gz
 
-RUN GRPC_HEALTH_PROBE_VERSION=v0.4.6 && \
+# Download Datadog Java tracing library
+RUN mkdir -p /opt/datadog && \
+wget -O /opt/datadog/dd-java-agent.jar 'https://dtdg.co/latest-java-tracer'
+
+RUN GRPC_HEALTH_PROBE_VERSION=v0.4.11 && \
     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-arm && \
     chmod +x /bin/grpc_health_probe
 

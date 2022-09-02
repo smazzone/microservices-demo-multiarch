@@ -22,7 +22,7 @@ RUN apt-get update -qqy && \
 ENV PYTHONUNBUFFERED=0
 
 # download the grpc health probe
-RUN GRPC_HEALTH_PROBE_VERSION=v0.4.6 && \
+RUN GRPC_HEALTH_PROBE_VERSION=v0.4.11 && \
     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-arm64 && \
     chmod +x /bin/grpc_health_probe
 
@@ -38,4 +38,4 @@ COPY . .
 ENV PORT "8080"
 EXPOSE 8080
 
-ENTRYPOINT ["python", "/recommendationservice/recommendation_server.py"]
+ENTRYPOINT ["ddtrace-run","python", "/recommendationservice/recommendation_server.py"]

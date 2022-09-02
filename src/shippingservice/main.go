@@ -20,7 +20,11 @@ import (
 	"os"
 	"time"
 
-	"cloud.google.com/go/profiler"
+	grpctrace "gopkg.in/DataDog/dd-trace-go.v1/contrib/google.golang.org/grpc"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
+	"gopkg.in/DataDog/dd-trace-go.v1/profiler"
+
+	profilerold "cloud.google.com/go/profiler"
 	"contrib.go.opencensus.io/exporter/jaeger"
 	"contrib.go.opencensus.io/exporter/stackdriver"
 	"github.com/sirupsen/logrus"
@@ -58,6 +62,23 @@ func init() {
 }
 
 func main() {
+	tracer.Start(tracer.WithRuntimeMetrics())
+	err := profiler.Start(
+		profiler.WithProfileTypes(
+			profiler.CPUProfile,
+			profiler.HeapProfile,
+
+			// The profiles below are disabled by
+			// default to keep overhead low, but
+			// can be enabled as needed.
+			// profiler.BlockProfile,
+			// profiler.MutexProfile,
+			// profiler.GoroutineProfile,
+		),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
 	if os.Getenv("DISABLE_TRACING") == "" {
 		log.Info("Tracing enabled.")
 		go initTracing()
@@ -83,13 +104,17 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
+	// Create the server interceptor using the grpc trace package.
+	si := grpctrace.StreamServerInterceptor()
+	ui := grpctrace.UnaryServerInterceptor()
+
 	var srv *grpc.Server
 	if os.Getenv("DISABLE_STATS") == "" {
 		log.Info("Stats enabled.")
-		srv = grpc.NewServer(grpc.StatsHandler(&ocgrpc.ServerHandler{}))
+		srv = grpc.NewServer(grpc.StatsHandler(&ocgrpc.ServerHandler{}), grpc.StreamInterceptor(si), grpc.UnaryInterceptor(ui))
 	} else {
 		log.Info("Stats disabled.")
-		srv = grpc.NewServer()
+		srv = grpc.NewServer(grpc.StreamInterceptor(si), grpc.UnaryInterceptor(ui))
 	}
 	svc := &server{}
 	pb.RegisterShippingServiceServer(srv, svc)
@@ -101,6 +126,8 @@ func main() {
 	if err := srv.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
+	defer tracer.Stop()
+	defer profiler.Stop()
 }
 
 // server controls RPC service responses.
@@ -218,7 +245,7 @@ func initProfiling(service, version string) {
 	// TODO(ahmetb) this method is duplicated in other microservices using Go
 	// since they are not sharing packages.
 	for i := 1; i <= 3; i++ {
-		if err := profiler.Start(profiler.Config{
+		if err := profilerold.Start(profilerold.Config{
 			Service:        service,
 			ServiceVersion: version,
 			// ProjectID must be set if not running on GCP.

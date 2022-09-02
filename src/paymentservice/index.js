@@ -16,6 +16,8 @@
 
 'use strict';
 
+// This line must come before importing any instrumented module.
+const tracer = require('dd-trace').init()
 
 if(process.env.DISABLE_PROFILER) {
   console.log("Profiler disabled.")

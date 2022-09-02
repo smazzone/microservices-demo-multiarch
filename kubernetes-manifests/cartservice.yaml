@@ -16,6 +16,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cartservice
+  labels:
+      tags.datadoghq.com/env: "dev"
+      tags.datadoghq.com/service: "cartservice"
+      tags.datadoghq.com/version: "1.0"  
 spec:
   selector:
     matchLabels:
@@ -24,15 +28,45 @@ spec:
     metadata:
       labels:
         app: cartservice
+        tags.datadoghq.com/env: "dev"
+        tags.datadoghq.com/service: "cartservice"
+        tags.datadoghq.com/version: "1.0"  
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
+      volumes:
+        - hostPath:
+            path: /var/run/datadog/
+          name: apmsocketpath
       containers:
       - name: server
         image: cartservice
+        volumeMounts:
+          - name: apmsocketpath
+            mountPath: /var/run/datadog        
         ports:
         - containerPort: 7070
         env:
+        - name: DD_ENV
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/env']
+        - name: DD_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/version']
+        - name: DD_SERVICE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/service']
+        - name: DD_LOGS_INJECTION
+          value: "true"
+        - name: DD_TRACE_SAMPLE_RATE
+          value: "1"
+        - name: DD_RUNTIME_METRICS_ENABLED
+          value: "true"
+        - name: DD_PROFILING_ENABLED
+          value: "true"        
         - name: REDIS_ADDR
           value: "redis-cart:6379"
         resources:
@@ -42,15 +76,16 @@ spec:
           limits:
             cpu: 300m
             memory: 128Mi
-        readinessProbe:
-          initialDelaySeconds: 15
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
-        livenessProbe:
-          initialDelaySeconds: 15
-          periodSeconds: 10
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
+        # readinessProbe:
+        #   initialDelaySeconds: 15
+        #   exec:
+        #     command: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
+        # livenessProbe:
+        #   initialDelaySeconds: 15
+        #   periodSeconds: 10
+        #   exec:
+        #     command: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
+
 ---
 apiVersion: v1
 kind: Service

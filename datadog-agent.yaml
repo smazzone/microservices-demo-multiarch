@@ -1,0 +1,25 @@
+apiVersion: datadoghq.com/v1alpha1
+kind: DatadogAgent
+metadata:
+  name: datadog
+spec:
+  credentials:
+    apiSecret:
+      secretName: datadog-secret
+      keyName: api-key
+    appSecret:
+      secretName: datadog-secret
+      keyName: app-key
+  agent:
+    image:
+      name: "gcr.io/datadoghq/agent:latest"
+    apm:
+      enabled: true
+    process:
+      enabled: true
+    log:
+      enabled: true
+      logsConfigContainerCollectAll: true
+  clusterAgent:
+    image:
+      name: "gcr.io/datadoghq/cluster-agent:latest"

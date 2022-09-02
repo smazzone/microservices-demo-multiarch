@@ -16,6 +16,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: shippingservice
+  labels:
+    tags.datadoghq.com/env: "dev"
+    tags.datadoghq.com/service: "shippingservice"
+    tags.datadoghq.com/version: "1.0"
 spec:
   selector:
     matchLabels:
@@ -24,8 +28,15 @@ spec:
     metadata:
       labels:
         app: shippingservice
+        tags.datadoghq.com/env: "dev"
+        tags.datadoghq.com/service: "shippingservice"
+        tags.datadoghq.com/version: "1.0"
     spec:
       serviceAccountName: default
+      volumes:
+        - hostPath:
+            path: /var/run/datadog/
+          name: apmsocketpath
       containers:
       - name: server
         image: shippingservice
@@ -42,13 +53,32 @@ spec:
           value: "1"
         # - name: JAEGER_SERVICE_ADDR
         #   value: "jaeger-collector:14268"
-        readinessProbe:
-          periodSeconds: 5
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:50051"]
-        livenessProbe:
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:50051"]
+        #this is needed to make it work on docker desktop on M1
+        # readinessProbe:
+        #   periodSeconds: 5      
+        #   exec:
+        #     command: ["/bin/grpc_health_probe", "-addr=:50051"]
+        # livenessProbe:
+        #   exec:
+        #     command: ["/bin/grpc_health_probe", "-addr=:50051"]
+        - name: DD_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: DD_ENV
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/env']
+        - name: DD_SERVICE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/service']
+        - name: DD_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/version']
+        - name: DD_TRACE_SAMPLE_RATE
+          value: "1"   
         resources:
           requests:
             cpu: 100m

@@ -14,6 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+#import ddtrace x runtime metrics
+from ddtrace.runtime import RuntimeMetrics
+
 from concurrent import futures
 import argparse
 import os
@@ -36,7 +39,7 @@ from opencensus.common.transports.async_ import AsyncTransport
 from opencensus.trace import samplers
 
 # import googleclouddebugger
-import googlecloudprofiler
+#import googlecloudprofiler
 
 from logger import getJSONLogger
 logger = getJSONLogger('emailservice-server')
@@ -172,6 +175,10 @@ def initStackdriverProfiling():
 
 if __name__ == '__main__':
   logger.info('starting the email service in dummy mode.')
+
+  #enable runtime metrics collection
+  RuntimeMetrics.enable()
+
 
   # Profiler
   try:

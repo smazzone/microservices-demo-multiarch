@@ -1,105 +1,105 @@
 {
     "products": [
         {
+            "id": "0PUK6V6EV0",
+            "name": "Dog Headphones",
+            "description": "You feel it the minute you put them on. The soft, plush cushions seal you in.",
+            "picture": "/static/img/products/headphones.jpg",
+            "priceUsd": {
+                "currencyCode": "USD",
+                "units": 229,
+                "nanos": 990000000
+            },
+            "categories": ["accessories"]
+        },
+        {
+            "id": "1YMWWN1N4O",
+            "name": "Dog Steel Bottle",
+            "description": "NoLimit - robust stainless steel vacuum flask including sports lid.",
+            "picture": "/static/img/products/steel-bottle.jpg",
+            "priceUsd": {
+                "currencyCode": "USD",
+                "units": 35,
+                "nanos": 970000000
+            },
+            "categories": ["accessories"]
+        },
+        {
+            "id": "2ZYFJ3GM2N",
+            "name": "Dog T-shirt",
+            "description": "Perfectly cropped cotton t-shirt. Short sleeves.",
+            "picture": "/static/img/products/t-shirt.jpg",
+            "priceUsd": {
+                "currencyCode": "USD",
+                "units": 29,
+                "nanos": 990000000
+            },
+            "categories": ["clothing", "t-shirt"]
+        },        
+        {
+            "id": "66VCHSJNUP",
+            "name": "Dog T-shirt I love you",
+            "description": "Perfectly cropped cotton t-shirt. Short sleeves.",
+            "picture": "/static/img/products/t-shirt-i-love-u.jpg",
+            "priceUsd": {
+                "currencyCode": "USD",
+                "units": 29,
+                "nanos": 990000000
+            },
+            "categories": ["clothing", "t-shirt"]
+        },       
+        {
+            "id": "6E92ZMYYFZ",
+            "name": "Dog Sweatshirt gray",
+            "description": "Perfectly cropped cotton sweatshirt. Long sleeves.",
+            "picture": "/static/img/products/sweatshirt-gray.jpg",
+            "priceUsd": {
+                "currencyCode": "USD",
+                "units": 39,
+                "nanos": 990000000
+            },
+            "categories": ["clothing", "sweatshirt"]
+        },
+        {
+            "id": "9SIQT8TOJO",
+            "name": "Dog Sweatshirt black",
+            "description": "Perfectly cropped cotton sweatshirt. Long sleeves.",
+            "picture": "/static/img/products/sweatshirt-black.jpg",
+            "priceUsd": {
+                "currencyCode": "USD",
+                "units": 45,
+                "nanos": 990000000
+            },
+            "categories": ["clothing", "sweatshirt"]
+        },
+        {
             "id": "OLJCESPC7Z",
-            "name": "Sunglasses",
-            "description": "Add a modern touch to your outfits with these sleek aviator sunglasses.",
-            "picture": "/static/img/products/sunglasses.jpg",
+            "name": "Dog Notebook",
+            "description": "The perfect companion for taking notes during your meetings.",
+            "picture": "/static/img/products/notebook.jpg",
             "priceUsd": {
                 "currencyCode": "USD",
                 "units": 19,
                 "nanos": 990000000
             },
-            "categories": ["accessories"]
-        },
-        {
-            "id": "66VCHSJNUP",
-            "name": "Tank Top",
-            "description": "Perfectly cropped cotton tank, with a scooped neckline.",
-            "picture": "/static/img/products/tank-top.jpg",
-            "priceUsd": {
-                "currencyCode": "USD",
-                "units": 18,
-                "nanos": 990000000
-            },
-            "categories": ["clothing", "tops"]
-        },
-        {
-            "id": "1YMWWN1N4O",
-            "name": "Watch",
-            "description": "This gold-tone stainless steel watch will work with most of your outfits.",
-            "picture": "/static/img/products/watch.jpg",
-            "priceUsd": {
-                "currencyCode": "USD",
-                "units": 109,
-                "nanos": 990000000
-            },
-            "categories": ["accessories"]
-        },
+            "categories": ["accessories","office"]
+        },                          
         {
             "id": "L9ECAV7KIM",
-            "name": "Loafers",
-            "description": "A neat addition to your summer wardrobe.",
-            "picture": "/static/img/products/loafers.jpg",
+            "name": "Dog SKO Notebook",
+            "description": "The perfect companion for taking notes during SKOs.",
+            "picture": "/static/img/products/sko-notebook.jpg",
             "priceUsd": {
                 "currencyCode": "USD",
-                "units": 89,
+                "units": 19,
                 "nanos": 990000000
             },
-            "categories": ["footwear"]
-        },
-        {
-            "id": "2ZYFJ3GM2N",
-            "name": "Hairdryer",
-            "description": "This lightweight hairdryer has 3 heat and speed settings. It's perfect for travel.",
-            "picture": "/static/img/products/hairdryer.jpg",
-            "priceUsd": {
-                "currencyCode": "USD",
-                "units": 24,
-                "nanos": 990000000
-            },
-            "categories": ["hair", "beauty"]
-        },
-        {
-            "id": "0PUK6V6EV0",
-            "name": "Candle Holder",
-            "description": "This small but intricate candle holder is an excellent gift.",
-            "picture": "/static/img/products/candle-holder.jpg",
-            "priceUsd": {
-                "currencyCode": "USD",
-                "units": 18,
-                "nanos": 990000000
-            },
-            "categories": ["decor", "home"]
+            "categories": ["accessories","office"]
         },
         {
             "id": "LS4PSXUNUM",
-            "name": "Salt & Pepper Shakers",
-            "description": "Add some flavor to your kitchen.",
-            "picture": "/static/img/products/salt-and-pepper-shakers.jpg",
-            "priceUsd": {
-                "currencyCode": "USD",
-                "units": 18,
-                "nanos": 490000000
-            },
-            "categories": ["kitchen"]
-        },
-        {
-            "id": "9SIQT8TOJO",
-            "name": "Bamboo Glass Jar",
-            "description": "This bamboo glass jar can hold 57 oz (1.7 l) and is perfect for any kitchen.",
-            "picture": "/static/img/products/bamboo-glass-jar.jpg",
-            "priceUsd": {
-                "currencyCode": "USD",
-                "units": 5,
-                "nanos": 490000000
-            },
-            "categories": ["kitchen"]
-        },
-        {
-            "id": "6E92ZMYYFZ",
-            "name": "Mug",
-            "description": "A simple mug with a mustard interior.",
+            "name": "Dog Mug",
+            "description": "A simple mug with a nice branding.",
             "picture": "/static/img/products/mug.jpg",
             "priceUsd": {
                 "currencyCode": "USD",

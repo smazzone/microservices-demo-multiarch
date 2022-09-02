@@ -20,8 +20,11 @@ import time
 import traceback
 from concurrent import futures
 
+#import ddtrace x runtime metrics
+from ddtrace.runtime import RuntimeMetrics
+
 #import googleclouddebugger
-import googlecloudprofiler
+#import googlecloudprofiler
 from google.auth.exceptions import DefaultCredentialsError
 import grpc
 from opencensus.ext.stackdriver import trace_exporter as stackdriver_exporter
@@ -92,8 +95,9 @@ class RecommendationService(demo_pb2_grpc.RecommendationServiceServicer):
 
 if __name__ == "__main__":
     logger.info("initializing recommendationservice")
-
     try:
+      #enable runtime metrics collection
+      RuntimeMetrics.enable()
       if "DISABLE_PROFILER" in os.environ:
         raise KeyError()
       else:
