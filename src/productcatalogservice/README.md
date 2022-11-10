@@ -36,3 +36,13 @@ This service has an `EXTRA_LATENCY` environment variable. This will inject a sle
 to the server.
 
 For example, use `EXTRA_LATENCY="5.5s"` to sleep for 5.5 seconds on every request.
+
+# this won't work...
+# kubectl set env \
+#    $(kubectl get pods -l app=productcatalogservice -o jsonpath='{.items[0].metadata.name}') \ 
+#    EXTRA_LATENCY="10.5s"
+
+# kubectl exec -it \
+#    $(kubectl get pods -l app=productcatalogservice -o jsonpath='{.items[0].metadata.name}') \
+#    -- /bin/sh
+# export EXTRA_LATENCY="10.5s"   

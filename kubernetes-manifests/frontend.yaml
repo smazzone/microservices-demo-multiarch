@@ -92,10 +92,10 @@ spec:
           #   value: "jaeger-collector:14268"
           # - name: CYMBAL_BRANDING
           #   value: "true"
-          - name: DD_AGENT_HOST
-            valueFrom:
-              fieldRef:
-                fieldPath: status.hostIP
+          # - name: DD_AGENT_HOST
+          #   valueFrom:
+          #     fieldRef:
+          #       fieldPath: status.hostIP
           - name: DD_ENV
             valueFrom:
               fieldRef:
