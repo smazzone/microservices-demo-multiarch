@@ -57,10 +57,6 @@ spec:
           value: "1"
         # - name: JAEGER_SERVICE_ADDR
         #   value: "jaeger-collector:14268"
-        # - name: DD_AGENT_HOST
-        #   valueFrom:
-        #     fieldRef:
-        #       fieldPath: status.hostIP
         - name: DD_ENV
           valueFrom:
             fieldRef:

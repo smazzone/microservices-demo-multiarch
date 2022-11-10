@@ -53,10 +53,6 @@ spec:
           #   exec:
           #     command: ["/bin/grpc_health_probe", "-addr=:5050"]
           env:
-          # - name: DD_AGENT_HOST
-          #   valueFrom:
-          #     fieldRef:
-          #       fieldPath: status.hostIP
           - name: DD_ENV
             valueFrom:
               fieldRef:
