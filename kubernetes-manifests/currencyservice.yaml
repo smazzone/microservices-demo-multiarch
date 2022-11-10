@@ -41,6 +41,9 @@ spec:
       containers:
       - name: server
         image: currencyservice
+        volumeMounts:
+          - name: apmsocketpath
+            mountPath: /var/run/datadog
         ports:
         - name: grpc
           containerPort: 7000
@@ -53,10 +56,10 @@ spec:
           value: "1"
         - name: DISABLE_DEBUGGER
           value: "1"
-        - name: DD_AGENT_HOST
-          valueFrom:
-            fieldRef:
-              fieldPath: status.hostIP
+        # - name: DD_AGENT_HOST
+        #   valueFrom:
+        #     fieldRef:
+        #       fieldPath: status.hostIP
         - name: DD_ENV
           valueFrom:
             fieldRef:

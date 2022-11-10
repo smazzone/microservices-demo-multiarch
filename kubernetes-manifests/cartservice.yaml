@@ -65,8 +65,6 @@ spec:
           value: "1"
         - name: DD_RUNTIME_METRICS_ENABLED
           value: "true"
-        - name: DD_PROFILING_ENABLED
-          value: "true"        
         - name: REDIS_ADDR
           value: "redis-cart:6379"
         resources:

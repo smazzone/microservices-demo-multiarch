@@ -65,10 +65,10 @@ spec:
           value: "1"
         - name: DISABLE_DEBUGGER
           value: "1"
-        - name: DD_AGENT_HOST
-          valueFrom:
-            fieldRef:
-              fieldPath: status.hostIP
+        # - name: DD_AGENT_HOST
+        #   valueFrom:
+        #     fieldRef:
+        #       fieldPath: status.hostIP
         - name: DD_ENV
           valueFrom:
             fieldRef:

@@ -53,10 +53,10 @@ spec:
           value: "1"
         - name: DISABLE_PROFILER
           value: "1"
-        - name: DD_AGENT_HOST
-          valueFrom:
-            fieldRef:
-              fieldPath: status.hostIP
+        # - name: DD_AGENT_HOST
+        #   valueFrom:
+        #     fieldRef:
+        #       fieldPath: status.hostIP
         - name: DD_ENV
           valueFrom:
             fieldRef:
@@ -74,7 +74,7 @@ spec:
         - name: DD_LOGS_INJECTION
           value: "true"
         - name: DD_TRACE_SAMPLE_RATE
-          value: "1"     
+          value: "1"
         # readinessProbe:
         #   periodSeconds: 5
         #   exec:

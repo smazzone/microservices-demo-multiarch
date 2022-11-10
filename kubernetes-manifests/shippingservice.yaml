@@ -40,6 +40,9 @@ spec:
       containers:
       - name: server
         image: shippingservice
+        volumeMounts:
+          - name: apmsocketpath
+            mountPath: /var/run/datadog
         ports:
         - containerPort: 50051
         env:
@@ -61,10 +64,10 @@ spec:
         # livenessProbe:
         #   exec:
         #     command: ["/bin/grpc_health_probe", "-addr=:50051"]
-        - name: DD_AGENT_HOST
-          valueFrom:
-            fieldRef:
-              fieldPath: status.hostIP
+        # - name: DD_AGENT_HOST
+        #   valueFrom:
+        #     fieldRef:
+        #       fieldPath: status.hostIP
         - name: DD_ENV
           valueFrom:
             fieldRef:
