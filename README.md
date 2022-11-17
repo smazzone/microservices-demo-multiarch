@@ -4,6 +4,7 @@
 
 ## Release 0.4.1 - with arm support
 ## Nov 2022
+## Stefano
 
 ![Continuous Integration](https://github.com/GoogleCloudPlatform/microservices-demo/workflows/Continuous%20Integration%20-%20Main/Release/badge.svg)
 
