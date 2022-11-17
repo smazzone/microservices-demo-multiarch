@@ -2,7 +2,7 @@
 <img src="src/frontend/static/icons/Hipster_HeroLogoCyan.svg" width="300" alt="Online Boutique" />
 </p>
 
-## Release 0.4.1
+## Release 0.4.1 - with arm support
 
 ![Continuous Integration](https://github.com/GoogleCloudPlatform/microservices-demo/workflows/Continuous%20Integration%20-%20Main/Release/badge.svg)
 
