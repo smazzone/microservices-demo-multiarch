@@ -146,8 +146,8 @@ spec:
 #  type: LoadBalancer
 # # for AWS EKS cluster, you can restrict access to your public IP
   type: LoadBalancer
-  loadBalancerSourceRanges:
-  - "80.117.68.35/32"
+  # loadBalancerSourceRanges:
+  # - "80.117.68.35/32"
   selector:
     app: frontend
   ports:
