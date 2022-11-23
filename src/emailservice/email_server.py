@@ -37,7 +37,7 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 
 # import googleclouddebugger
-import googlecloudprofiler
+#import googlecloudprofiler
 
 from logger import getJSONLogger
 logger = getJSONLogger('emailservice-server')

@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM python:3.9.15-slim as base
+
+FROM --platform=$BUILDPLATFORM python:3.9.15-slim as base
 
 FROM base as builder
 
@@ -22,9 +23,31 @@ RUN apt-get -qq update \
     && rm -rf /var/lib/apt/lists/*
 
 # Download the grpc health probe
+# RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
+#     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-arm64 && \
+#     chmod +x /bin/grpc_health_probe
+
+# "change to ARCH=arm if you are on M1 or ARCH=amd if your are on Intel"
+# ARG ARCH=arm
+# RUN echo $ARCH
+# ENV ARCH=arm
+# RUN echo $ARCH
+
+ARG TARGETOS 
+ARG TARGETARCH
+# RUN echo ${TARGETOS}
+# RUN echo ${TARGETARCH}
+
+
+
+# RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
+#     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${ARCH}64 && \
+#     chmod +x /bin/grpc_health_probe
+
 RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
-    wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-arm64 && \
+    wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${TARGETARCH} && \
     chmod +x /bin/grpc_health_probe
+
 
 # get packages
 COPY requirements.txt .
@@ -34,7 +57,7 @@ FROM base as without-grpc-health-probe-bin
 # Enable unbuffered logging
 ENV PYTHONUNBUFFERED=1
 # Enable Profiler
-ENV ENABLE_PROFILER=1
+ENV ENABLE_PROFILER=0
 
 WORKDIR /email_server
 

@@ -14,9 +14,8 @@
 
 
 #FROM eclipse-temurin:18 as builder
-#FROM openjdk:18-slim as builder
+FROM openjdk:18-slim as builder
 
-FROM --platform=$BUILDPLATFORM eclipse-temurin:18 as builder
 
 #this works on arm64
 #FROM arm64v8/openjdk:18-slim as builder
@@ -33,10 +32,7 @@ RUN chmod +x gradlew
 RUN ./gradlew installDist
 
 #FROM eclipse-temurin:18.0.2.1_1-jre-alpine as without-grpc-health-probe-bin
-
-#FROM openjdk:18-slim as without-grpc-health-probe-bin
-
-FROM --platform=$BUILDPLATFORM eclipse-temurin:18.0.2.1_1-jre-jammy as without-grpc-health-probe-bin
+FROM openjdk:18-slim as without-grpc-health-probe-bin
 
 
 #this works on arm64
@@ -63,21 +59,17 @@ ENTRYPOINT ["/app/build/install/hipstershop/bin/AdService"]
 
 FROM without-grpc-health-probe-bin
 
-ARG TARGETOS 
-ARG TARGETARCH
-# RUN echo ${TARGETOS}
-# RUN echo ${TARGETARCH}
 
 # RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
 #     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-arm && \
 #     chmod +x /bin/grpc_health_probe
 
 # "change to ARCH=arm if you are on M1 or ARCH=amd if your are on Intel"
-# ARG ARCH=arm
-# RUN echo $ARCH
+ARG ARCH=arm
+RUN echo $ARCH
 # ENV ARCH=arm
 # RUN echo $ARCH
 
 RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
-    wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${TARGETARCH} && \
+    wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${ARCH}64 && \
     chmod +x /bin/grpc_health_probe
