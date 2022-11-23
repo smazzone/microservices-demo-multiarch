@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM --platform=$BUILDPLATFORM python:3.9.15-slim as base
+
+FROM python:3.9.15-slim as base
 
 FROM base as builder
 
@@ -21,28 +22,19 @@ RUN apt-get -qq update \
         wget g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# download the grpc health probe
+# Download the grpc health probe
 # RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
 #     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-arm64 && \
 #     chmod +x /bin/grpc_health_probe
 
 # "change to ARCH=arm if you are on M1 or ARCH=amd if your are on Intel"
-# ARG ARCH=arm
+ARG ARCH=arm
+RUN echo $ARCH
+# ENV ARCH=arm
 # RUN echo $ARCH
-# # ENV ARCH=arm
-# # RUN echo $ARCH
-
-# RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
-#     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${ARCH}64 && \
-#     chmod +x /bin/grpc_health_probe
-
-ARG TARGETOS 
-ARG TARGETARCH
-# RUN echo ${TARGETOS}
-# RUN echo ${TARGETARCH}
 
 RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
-    wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${TARGETARCH} && \
+    wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${ARCH}64 && \
     chmod +x /bin/grpc_health_probe
 
 # get packages
@@ -52,9 +44,10 @@ RUN pip install -r requirements.txt
 FROM base as without-grpc-health-probe-bin
 # Enable unbuffered logging
 ENV PYTHONUNBUFFERED=1
+# Enable Profiler
+ENV ENABLE_PROFILER=0
 
-# get packages
-WORKDIR /recommendationservice
+WORKDIR /email_server
 
 # Grab packages from builder
 COPY --from=builder /usr/local/lib/python3.9/ /usr/local/lib/python3.9/
@@ -62,11 +55,9 @@ COPY --from=builder /usr/local/lib/python3.9/ /usr/local/lib/python3.9/
 # Add the application
 COPY . .
 
-# set listen port
-ENV PORT "8080"
 EXPOSE 8080
-
-ENTRYPOINT ["python", "recommendation_server.py"]
+ENTRYPOINT [ "python", "email_server.py" ]
 
 FROM without-grpc-health-probe-bin
+
 COPY --from=builder /bin/grpc_health_probe /bin/grpc_health_probe
