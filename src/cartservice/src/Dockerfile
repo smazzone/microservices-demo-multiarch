@@ -39,12 +39,11 @@ RUN dotnet restore cartservice.csproj
 #RUN dotnet build "./cartservice.csproj" -c Release -r ${TARGETOS}-${ARCH} --no-self-contained -o /out
 
 RUN if [ "$TARGETARCH" == "amd64" ]; then \
-        echo "build for amd64" && \
-        dotnet build "./cartservice.csproj" -c Release -r linux-x64 --no-self-contained -o /out; \
+        RID=linux-x64 ; \
     elseif [ "$TARGETARCH" == "arm64" ]; then \
-        echo "build for arm64" && \
-        dotnet build "./cartservice.csproj" -c Release -r linux-arm64 --no-self-contained -o /out; \
-    fi
+        RID=linux-arm64 ; \
+    fi \
+    && dotnet build "./cartservice.csproj" -c Release -r $RID --no-self-contained -o /out
 
 FROM build AS publish
 
@@ -63,12 +62,12 @@ RUN echo ${TARGETARCH}
 #RUN dotnet publish cartservice.csproj -c Release -r ${TARGETOS}-${ARCH} --no-self-contained -o /out
 
 RUN if [ "$TARGETARCH" == "amd64" ]; then \
-        echo "publish for amd64" && \
-        dotnet publish cartservice.csproj -c Release -r linux-x64 --no-self-contained -o /out; \
+        RID=linux-x64 ; \
     elseif [ "$TARGETARCH" == "arm64" ]; then \
-        echo "publish for arm64" && \
-        dotnet publish cartservice.csproj -c Release -r linux-arm64 --no-self-contained -o /out; \
-    fi
+        RID=linux-arm64 ; \    
+    fi \
+    && dotnet publish cartservice.csproj -c Release -r $RID --no-self-contained -o /out
+
 
 # RUN if [ "$TARGETARCH" = "amd64" ]; then \
 #     RID=linux-x64 ; \
