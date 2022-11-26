@@ -35,6 +35,7 @@ WORKDIR /app
 COPY . .
 RUN dotnet restore cartservice.csproj
 
+
 #RUN dotnet build "./cartservice.csproj" -c Release -r ${TARGETOS}-${ARCH} --no-self-contained -o /out
 
 RUN if [ "$TARGETARCH" == "amd64" ]; then dotnet build cartservice.csproj -c Release -r linux-x64 --no-self-contained -o /out; else dotnet build cartservice.csproj -c Release -r linux-arm64 --no-self-contained -o /out; fi
