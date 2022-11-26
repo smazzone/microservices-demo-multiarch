@@ -77,6 +77,10 @@ spec:
           value: "1"
         - name: DD_RUNTIME_METRICS_ENABLED
           value: "true"
+        - name: DD_KUBERNETES_POD_LABELS_AS_TAGS
+          value: '{"*":"kube_%%label%%"}'
+        - name: DD_KUBERNETES_POD_ANNOTATIONS_AS_TAGS
+          value: '{"*":"kube_%%annotation%%"}'
         - name: REDIS_ADDR
           value: "redis-cart:6379"
         resources:

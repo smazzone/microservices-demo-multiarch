@@ -22,16 +22,20 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 
-ARG BUILDOS 
-ARG BUILDARCH
+# ARG BUILDOS 
+# ARG BUILDARCH
+ARG TARGETOS 
+ARG TARGETARCH
 # RUN echo ${BUILDOS}
 # RUN echo ${BUILDARCH}
+RUN echo ${TARGETOS}
+RUN echo ${TARGETARCH}
 
 # Skaffold passes in debug-oriented compiler flags
 ARG SKAFFOLD_GO_GCFLAGS
-RUN GOOS=$BUILDOS GOARCH=$BUILDARCH go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /productcatalogservice .
+RUN GOOS=$TARGETOS GOARCH=$TARGETARCH go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /productcatalogservice .
 
-FROM --platform=$BUILDPLATFORM alpine:3.16.2 AS without-grpc-health-probe-bin
+FROM alpine:3.16.2 AS without-grpc-health-probe-bin
 RUN apk add --no-cache ca-certificates
 
 WORKDIR /src
@@ -63,8 +67,8 @@ FROM without-grpc-health-probe-bin
 
 ARG TARGETOS 
 ARG TARGETARCH
-# RUN echo ${TARGETOS}
-# RUN echo ${TARGETARCH}
+RUN echo ${TARGETOS}
+RUN echo ${TARGETARCH}
 
 # RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
 #     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${ARCH}64 && \

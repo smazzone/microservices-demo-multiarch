@@ -14,7 +14,7 @@
 
 FROM --platform=$BUILDPLATFORM node:18.12.1-alpine as base
 
-FROM base as builder
+FROM --platform=$BUILDPLATFORM base as builder
 
 # Some packages (e.g. @google-cloud/profiler) require additional
 # deps for post-install scripts
@@ -59,8 +59,8 @@ FROM without-grpc-health-probe-bin
 
 ARG TARGETOS 
 ARG TARGETARCH
-# RUN echo ${TARGETOS}
-# RUN echo ${TARGETARCH}
+RUN echo ${TARGETOS}
+RUN echo ${TARGETARCH}
 
 RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${TARGETARCH} && \

@@ -35,8 +35,8 @@ RUN apt-get -qq update \
 
 ARG TARGETOS 
 ARG TARGETARCH
-# RUN echo ${TARGETOS}
-# RUN echo ${TARGETARCH}
+RUN echo ${TARGETOS}
+RUN echo ${TARGETARCH}
 
 
 
