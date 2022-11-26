@@ -14,6 +14,8 @@
 
 
 
+#FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:7.0.100-jammy AS build
+
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:7.0.100-jammy AS build
 
 
@@ -37,7 +39,7 @@ RUN dotnet restore cartservice.csproj
 
 RUN if [ "$TARGETARCH" == "amd64" ]; then dotnet build cartservice.csproj -c Release -r linux-x64 --no-self-contained -o /out; else dotnet build cartservice.csproj -c Release -r linux-arm64 --no-self-contained -o /out; fi
 
-FROM build AS publish
+FROM --platform=$BUILDPLATFORM build AS publish
 
 
 ARG BUILDOS
@@ -53,7 +55,6 @@ RUN echo ${TARGETARCH}
 #RUN dotnet publish cartservice.csproj -c Release -r ${TARGETOS}-${ARCH} --no-self-contained -o /out
 
 RUN if [ "$TARGETARCH" == "amd64" ]; then dotnet publish cartservice.csproj -c Release -r linux-x64 --no-self-contained -o /out; else dotnet publish cartservice.csproj -c Release -r linux-arm64 --no-self-contained -o /out; fi
-
 
 # Building final image used in running container
 
