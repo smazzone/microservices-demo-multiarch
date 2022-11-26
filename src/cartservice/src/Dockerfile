@@ -38,33 +38,32 @@ RUN dotnet restore cartservice.csproj
 
 #RUN dotnet build "./cartservice.csproj" -c Release -r ${TARGETOS}-${ARCH} --no-self-contained -o /out
 
-#RUN if [ "$TARGETARCH" == "amd64" ]; then dotnet build cartservice.csproj -c Release -r linux-x64 --no-self-contained -o /out; else dotnet build cartservice.csproj -c Release -r linux-arm64 --no-self-contained -o /out; fi
+RUN if [ "$TARGETARCH" == "amd64" ]; then dotnet build "./cartservice.csproj" -c Release -r linux-x64 --no-self-contained -o /out; else dotnet build "./cartservice.csproj" -c Release -r linux-arm64 --no-self-contained -o /out; fi
 
-#FROM build AS publish
+FROM build AS publish
 
 
 
-# ARG BUILDOS
-# ARG BUILDARCH
-# ARG TARGETOS 
-# ARG TARGETARCH
-# ARG ARCH
-# # RUN echo ${BUILDOS}
-# # RUN echo ${BUILDARCH}
-# RUN echo ${TARGETOS}
-# RUN echo ${TARGETARCH}
+ARG BUILDOS
+ARG BUILDARCH
+ARG TARGETOS 
+ARG TARGETARCH
+ARG ARCH
+# RUN echo ${BUILDOS}
+# RUN echo ${BUILDARCH}
+RUN echo ${TARGETOS}
+RUN echo ${TARGETARCH}
 
 #RUN dotnet publish cartservice.csproj -c Release -r ${TARGETOS}-${ARCH} --no-self-contained -o /out
 
-# RUN if [ "$TARGETARCH" == "amd64" ]; then dotnet publish cartservice.csproj -c Release -r linux-x64 --no-self-contained -o /out; else dotnet publish cartservice.csproj -c Release -r linux-arm64 --no-self-contained -o /out; fi
+RUN if [ "$TARGETARCH" == "amd64" ]; then dotnet publish cartservice.csproj -c Release -r linux-x64 --no-self-contained -o /out; else dotnet publish cartservice.csproj -c Release -r linux-arm64 --no-self-contained -o /out; fi
 
-
-RUN if [ "$TARGETARCH" = "amd64" ]; then \
-    RID=linux-x64 ; \
-    elif [ "$TARGETARCH" = "arm64" ]; then \
-    RID=linux-arm64 ; \
-    fi \
-    && dotnet publish "cartservice.csproj" -c Release -r $RID --no-self-contained -o /out
+# RUN if [ "$TARGETARCH" = "amd64" ]; then \
+#     RID=linux-x64 ; \
+#     elif [ "$TARGETARCH" = "arm64" ]; then \
+#     RID=linux-arm64 ; \
+#     fi \
+#     && dotnet publish cartservice.csproj -c Release -r $RID --no-self-contained -o /out
 
 # Building final image used in running container
 
