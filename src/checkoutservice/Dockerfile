@@ -26,15 +26,17 @@ COPY . .
 
 ARG BUILDOS 
 ARG BUILDARCH
-# RUN echo ${BUILDOS}
-# RUN echo ${BUILDARCH}
+ARG TARGETOS 
+ARG TARGETARCH
+RUN echo ${TARGETOS}
+RUN echo ${TARGETARCH}
 
 # Skaffold passes in debug-oriented compiler flags
 ARG SKAFFOLD_GO_GCFLAGS
-RUN GOOS=$BUILDOS GOARCH=$BUILDARCH go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /checkoutservice .
+RUN GOOS=$TARGETOS GOARCH=$TARGETARCH go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /checkoutservice .
 
 # FROM alpine:3.16.2 as without-grpc-health-probe-bin
-FROM --platform=$BUILDPLATFORM alpine:3.16.2 as without-grpc-health-probe-bin
+FROM alpine:3.16.2 as without-grpc-health-probe-bin
 RUN apk add --no-cache ca-certificates
 
 WORKDIR /src
@@ -61,8 +63,8 @@ FROM without-grpc-health-probe-bin
 
 ARG TARGETOS 
 ARG TARGETARCH
-# RUN echo ${TARGETOS}
-# RUN echo ${TARGETARCH}
+RUN echo ${TARGETOS}
+RUN echo ${TARGETARCH}
 
 # RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
 #     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${ARCH}64 && \

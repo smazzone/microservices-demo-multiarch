@@ -36,8 +36,12 @@ RUN ./gradlew installDist
 
 #FROM openjdk:18-slim as without-grpc-health-probe-bin
 
-FROM --platform=$BUILDPLATFORM eclipse-temurin:18.0.2.1_1-jre-jammy as without-grpc-health-probe-bin
+FROM eclipse-temurin:18.0.2.1_1-jre-jammy as without-grpc-health-probe-bin
 
+ARG TARGETOS 
+ARG TARGETARCH
+RUN echo ${TARGETOS}
+RUN echo ${TARGETARCH}
 
 #this works on arm64
 #FROM arm64v8/openjdk:18-slim as without-grpc-health-probe-bin
@@ -65,8 +69,8 @@ FROM without-grpc-health-probe-bin
 
 ARG TARGETOS 
 ARG TARGETARCH
-# RUN echo ${TARGETOS}
-# RUN echo ${TARGETARCH}
+RUN echo ${TARGETOS}
+RUN echo ${TARGETARCH}
 
 # RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
 #     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-arm && \

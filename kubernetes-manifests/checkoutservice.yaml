@@ -78,6 +78,10 @@ spec:
                 fieldPath: metadata.labels['tags.datadoghq.com/version']
           - name: DD_TRACE_SAMPLE_RATE
             value: "1"
+          - name: DD_KUBERNETES_POD_LABELS_AS_TAGS
+            value: '{"*":"kube_%%label%%"}'
+          - name: DD_KUBERNETES_POD_ANNOTATIONS_AS_TAGS
+            value: '{"*":"kube_%%annotation%%"}'
           - name: PORT
             value: "5050"
           - name: PRODUCT_CATALOG_SERVICE_ADDR

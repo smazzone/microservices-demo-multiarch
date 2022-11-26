@@ -13,10 +13,10 @@ module "eks" {
   }
 
   eks_managed_node_group_defaults = {
-    # ami_type = "AL2_x86_64"
+    ami_type = "AL2_x86_64"
 
     # we are going to use the ARM-based Graviton2 processors
-    ami_type = "AL2_ARM_64"
+    # ami_type = "AL2_ARM_64"
 
     #create_cluster_primary_security_group_tags = false
     
@@ -31,9 +31,9 @@ module "eks" {
     one = {
       name = "node-group-1"
 
-      # instance_types = ["t3.small"]
+      instance_types = ["t3.small"]
       # we are going to use the ARM-based Graviton2 instance types
-      instance_types = ["m6g.medium"]
+      # instance_types = ["m6g.medium"]
 
       min_size     = 1
       max_size     = 3
@@ -51,9 +51,9 @@ module "eks" {
     two = {
       name = "node-group-2"
 
-      # instance_types = ["t3.medium"]
+      instance_types = ["t3.medium"]
       # we are going to use the ARM-based Graviton2 instance types
-      instance_types = ["m6g.large"]
+      # instance_types = ["m6g.large"]
 
       min_size     = 1
       max_size     = 2

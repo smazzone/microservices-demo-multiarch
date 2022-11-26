@@ -22,16 +22,20 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 
-ARG BUILDOS 
-ARG BUILDARCH
+# ARG BUILDOS 
+# ARG BUILDARCH
 # RUN echo ${BUILDOS}
 # RUN echo ${BUILDARCH}
+ARG TARGETOS 
+ARG TARGETARCH
+RUN echo ${TARGETOS}
+RUN echo ${TARGETARCH}
 
 # Skaffold passes in debug-oriented compiler flags
 ARG SKAFFOLD_GO_GCFLAGS
-RUN GOOS=$BUILDOS GOARCH=$BUILDARCH go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /go/bin/frontend .
+RUN GOOS=$TARGETOS GOARCH=$TARGETARCH go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /go/bin/frontend .
 
-FROM --platform=$BUILDPLATFORM alpine:3.16.2 as release
+FROM alpine:3.16.2 as release
 RUN apk add --no-cache ca-certificates \
     busybox-extras net-tools bind-tools
 WORKDIR /src
