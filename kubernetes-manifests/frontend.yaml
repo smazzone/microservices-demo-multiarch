@@ -152,8 +152,8 @@ spec:
   type: LoadBalancer
   # loadBalancerSourceRanges:
   # - "80.117.68.35/32"
-  loadBalancerSourceRanges:
-  - "79.24.178.188/32"
+  # loadBalancerSourceRanges:
+  # - "79.24.178.188/32"
   selector:
     app: frontend
   ports:
