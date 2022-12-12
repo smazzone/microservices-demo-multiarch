@@ -31,12 +31,13 @@ spec:
         tags.datadoghq.com/env: "dev-auto-inject"
         tags.datadoghq.com/service: "shippingservice"
         tags.datadoghq.com/version: "1.0"
+        admission.datadoghq.com/enabled: "true"
     spec:
       serviceAccountName: default
-      volumes:
-        - hostPath:
-            path: /var/run/datadog/
-          name: apmsocketpath
+      # volumes:
+      #   - hostPath:
+      #       path: /var/run/datadog/
+      #     name: apmsocketpath
       securityContext:
         fsGroup: 1000
         runAsGroup: 1000
@@ -52,9 +53,9 @@ spec:
           privileged: false
           # readOnlyRootFilesystem: true
         image: shippingservice
-        volumeMounts:
-          - name: apmsocketpath
-            mountPath: /var/run/datadog
+        # volumeMounts:
+        #   - name: apmsocketpath
+        #     mountPath: /var/run/datadog
         ports:
         - containerPort: 50051
         env:
@@ -66,31 +67,37 @@ spec:
           value: "1"
         - name: DISABLE_PROFILER
           value: "1"
-        - name: DD_ENV
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.labels['tags.datadoghq.com/env']
-        - name: DD_SERVICE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.labels['tags.datadoghq.com/service']
-        - name: DD_VERSION
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.labels['tags.datadoghq.com/version']
+        # - name: DD_ENV
+        #   valueFrom:
+        #     fieldRef:
+        #       fieldPath: metadata.labels['tags.datadoghq.com/env']
+        # - name: DD_SERVICE
+        #   valueFrom:
+        #     fieldRef:
+        #       fieldPath: metadata.labels['tags.datadoghq.com/service']
+        # - name: DD_VERSION
+        #   valueFrom:
+        #     fieldRef:
+        #       fieldPath: metadata.labels['tags.datadoghq.com/version']
+        # - name: DD_TRACE_AGENT_URL
+        #   value: "unix:///var/run/datadog/apm.socket"
+        - name: DD_PROFILING_ENABLED
+          value: "true"
+        - name: DD_LOGS_INJECTION
+          value: "true"
         - name: DD_TRACE_SAMPLE_RATE
           value: "1"
         - name: DD_KUBERNETES_POD_LABELS_AS_TAGS
           value: '{"*":"kube_%%label%%"}'
         - name: DD_KUBERNETES_POD_ANNOTATIONS_AS_TAGS
           value: '{"*":"kube_%%annotation%%"}'
-        readinessProbe:
-          periodSeconds: 5
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:50051"]
-        livenessProbe:
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:50051"]
+        # readinessProbe:
+        #   periodSeconds: 5
+        #   exec:
+        #     command: ["/bin/grpc_health_probe", "-addr=:50051"]
+        # livenessProbe:
+        #   exec:
+        #     command: ["/bin/grpc_health_probe", "-addr=:50051"]
         resources:
           requests:
             cpu: 100m

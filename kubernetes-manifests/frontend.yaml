@@ -31,14 +31,15 @@ spec:
         tags.datadoghq.com/env: "dev-auto-inject"
         tags.datadoghq.com/service: "frontend"
         tags.datadoghq.com/version: "1.0"
+        admission.datadoghq.com/enabled: "true"
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "true"
     spec:
       serviceAccountName: default
-      volumes:
-        - hostPath:
-            path: /var/run/datadog/
-          name: apmsocketpath
+      # volumes:
+      #   - hostPath:
+      #       path: /var/run/datadog/
+      #     name: apmsocketpath
       securityContext:
         fsGroup: 1000
         runAsGroup: 1000
@@ -54,9 +55,9 @@ spec:
             privileged: false
             # readOnlyRootFilesystem: true
           image: frontend
-          volumeMounts:
-            - name: apmsocketpath
-              mountPath: /var/run/datadog
+          # volumeMounts:
+          #   - name: apmsocketpath
+          #     mountPath: /var/run/datadog
           ports:
           - containerPort: 8080
           readinessProbe:
@@ -102,18 +103,24 @@ spec:
             value: "0"
           # - name: CYMBAL_BRANDING
           #   value: "true"
-          - name: DD_ENV
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.labels['tags.datadoghq.com/env']
-          - name: DD_SERVICE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.labels['tags.datadoghq.com/service']
-          - name: DD_VERSION
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.labels['tags.datadoghq.com/version']
+          # - name: DD_ENV
+          #   valueFrom:
+          #     fieldRef:
+          #       fieldPath: metadata.labels['tags.datadoghq.com/env']
+          # - name: DD_SERVICE
+          #   valueFrom:
+          #     fieldRef:
+          #       fieldPath: metadata.labels['tags.datadoghq.com/service']
+          # - name: DD_VERSION
+          #   valueFrom:
+          #     fieldRef:
+          #       fieldPath: metadata.labels['tags.datadoghq.com/version']
+          # - name: DD_TRACE_AGENT_URL
+          #   value: "unix:///var/run/datadog/apm.socket"
+          - name: DD_PROFILING_ENABLED
+            value: "true"
+          - name: DD_LOGS_INJECTION
+            value: "true"
           - name: DD_TRACE_SAMPLE_RATE
             value: "1"
           - name: DD_KUBERNETES_POD_LABELS_AS_TAGS

@@ -71,12 +71,12 @@ spec:
           value: '{"*":"kube_%%label%%"}'
         - name: DD_KUBERNETES_POD_ANNOTATIONS_AS_TAGS
           value: '{"*":"kube_%%annotation%%"}'
-        readinessProbe:
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:50051"]
-        livenessProbe:
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:50051"]
+        # readinessProbe:
+        #   exec:
+        #     command: ["/bin/grpc_health_probe", "-addr=:50051"]
+        # livenessProbe:
+        #   exec:
+        #     command: ["/bin/grpc_health_probe", "-addr=:50051"]
         resources:
           requests:
             cpu: 100m
