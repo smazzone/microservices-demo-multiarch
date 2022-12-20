@@ -115,5 +115,5 @@ ENV DD_DOTNET_TRACER_HOME=/opt/datadog
 ENV DD_INTEGRATIONS=/opt/datadog/integrations.json
 ENV LD_PRELOAD=/opt/datadog/continuousprofiler/Datadog.Linux.ApiWrapper.x64.so
 ENV DD_PROFILING_ENABLED=1
-ENV DD_TRACE_DEBUG=1
+ENV DD_TRACE_DEBUG=0
 ENTRYPOINT ["dotnet", "cartservice.dll"]
