@@ -240,12 +240,12 @@ Launch a local Kubernetes cluster with one of the following tools:
 
 4. Run `kubectl get pods` to verify the Pods are ready and running.
 
-5. Docker Desktop should automatically provide the frontend at `http://localhost:80`
+5. Docker Desktop should automatically provide the frontend at http://localhost:80
 6. Minikube requires you to run a command to access the frontend service:
 `minikube service frontend-external`
 7. Kind does not provision an IP address for the service. You must run a port-forwarding process to access the frontend at http://localhost:8080:
 `kubectl port-forward deployment/frontend 8080:8080` to forward a port to the frontend service.
-9. Navigate to either `http://localhost:80` or `http://localhost:8080` to access the web frontend.
+9. Navigate to either http://localhost:80 or http://localhost:8080 to access the web frontend.
 
 
 ## Cleanup
