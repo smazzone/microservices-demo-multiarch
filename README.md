@@ -236,7 +236,7 @@ Launch a local Kubernetes cluster with one of the following tools:
 	`skaffold run --default-repo docker.io/smazzone --platform=linux/arm64`
 	
 	if you are on a PC or an Intel-based Mac or you are on amd use the --platform accordingly
-	
+  
   `skaffold run --default-repo docker.io/smazzone --platform=linux/amd64`
    
 
