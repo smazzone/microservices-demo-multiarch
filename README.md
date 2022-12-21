@@ -232,10 +232,12 @@ Launch a local Kubernetes cluster with one of the following tools:
 	if you want to use your own images or you can use mine**
 	
 	if you are on Mac M1 or M2 or you are on arm use the --platform accordingly
+
 	`skaffold run --default-repo docker.io/smazzone --platform=linux/arm64`
 	
 	if you are on a PC or an Intel-based Mac or you are on amd use the --platform accordingly
-	`skaffold run --default-repo docker.io/smazzone --platform=linux/amd64`
+	
+  `skaffold run --default-repo docker.io/smazzone --platform=linux/amd64`
    
 
 4. Run `kubectl get pods` to verify the Pods are ready and running.
