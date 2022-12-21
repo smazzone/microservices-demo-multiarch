@@ -8,11 +8,11 @@
 
 <!-- ![Continuous Integration](https://github.com/GoogleCloudPlatform/microservices-demo/workflows/Continuous%20Integration%20-%20Main/Release/badge.svg) -->
 
-**Swagstore is a cloned version of Online Boutique** which in turn is a cloud-first microservices demo application.
+**Swagstore is a cloned version of [Online Boutique](https://github.com/GoogleCloudPlatform/microservices-demo)** which in turn is a cloud-first microservices demo application.
 The app consists of an 11-tier microservices application. The application is a
 web-based e-commerce app where users can browse items,
 add them to the cart, and purchase them.
-Swagstore is a slightly modified version from the original Online Boutique. In fact, items on the Swagstore are actually Datadog swags.
+Swagstore is a slightly modified version from the original [Online Boutique](https://github.com/GoogleCloudPlatform/microservices-demo). In fact, items on the Swagstore are actually Datadog swags.
 It is a ficticious ecommerce swag store, don't expect to receive swags :grinning:
 
 **Google uses this application to demonstrate use of technologies like
