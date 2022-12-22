@@ -19,7 +19,7 @@ metadata:
   labels:
       tags.datadoghq.com/env: "dev-auto-inject"
       tags.datadoghq.com/service: "paymentservice"
-      tags.datadoghq.com/version: "1.0"
+      tags.datadoghq.com/version: "0.5.0"
 spec:
   selector:
     matchLabels:
@@ -30,10 +30,10 @@ spec:
         app: paymentservice
         tags.datadoghq.com/env: "dev-auto-inject"
         tags.datadoghq.com/service: "paymentservice"
-        tags.datadoghq.com/version: "1.0"
+        tags.datadoghq.com/version: "0.5.0"
         admission.datadoghq.com/enabled: "true"
       annotations:
-        admission.datadoghq.com/js-lib.version: "v3.6.0"
+        admission.datadoghq.com/js-lib.version: "v3.9.1"
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
@@ -67,16 +67,12 @@ spec:
           value: "1"
         - name: DD_PROFILING_ENABLED
           value: "true"
-        - name: DD_KUBERNETES_POD_LABELS_AS_TAGS
-          value: '{"*":"kube_%%label%%"}'
-        - name: DD_KUBERNETES_POD_ANNOTATIONS_AS_TAGS
-          value: '{"*":"kube_%%annotation%%"}'
-        # readinessProbe:
-        #   exec:
-        #     command: ["/bin/grpc_health_probe", "-addr=:50051"]
-        # livenessProbe:
-        #   exec:
-        #     command: ["/bin/grpc_health_probe", "-addr=:50051"]
+        readinessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:50051"]
+        livenessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:50051"]
         resources:
           requests:
             cpu: 100m

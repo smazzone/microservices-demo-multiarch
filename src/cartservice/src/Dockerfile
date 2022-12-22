@@ -12,12 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-
-#FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:7.0.100-jammy AS build
-
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:7.0.100-jammy AS build
-
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:7.0@sha256:81383de6f3bf443625eb277b203f6141f3496fd5a9e1b9b45a4c725266c9d92a AS build
 
 ARG TARGETPLATFORM
 ARG BUILDOS
@@ -29,14 +24,10 @@ ARG ARCH
 RUN echo ${TARGETOS}
 RUN echo ${TARGETARCH}
 
-
-
 WORKDIR /app
 COPY . .
 RUN dotnet restore cartservice.csproj
-
-
-#RUN dotnet build "./cartservice.csproj" -c Release -r ${TARGETOS}-${ARCH} --no-self-contained -o /out
+# RUN dotnet build "./cartservice.csproj" -c Debug -o /out
 
 RUN if [ "$TARGETARCH" = "amd64" ]; then \
     RID=linux-x64 ; \
@@ -45,11 +36,7 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
     fi \
     && dotnet build "./cartservice.csproj" -c Release -r $RID --no-self-contained -o /out
 
-
-
 FROM build AS publish
-
-
 
 ARG BUILDOS
 ARG BUILDARCH
@@ -61,7 +48,7 @@ ARG ARCH
 RUN echo ${TARGETOS}
 RUN echo ${TARGETARCH}
 
-#RUN dotnet publish cartservice.csproj -c Release -r ${TARGETOS}-${ARCH} --no-self-contained -o /out
+# RUN dotnet publish cartservice.csproj -c Debug -o /out
 
 RUN if [ "$TARGETARCH" = "amd64" ]; then \
     RID=linux-x64 ; \
@@ -70,10 +57,8 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
     fi \
     && dotnet publish cartservice.csproj -c Release -r $RID --no-self-contained -o /out
 
-
 # Building final image used in running container
-
-FROM mcr.microsoft.com/dotnet/aspnet:7.0.0-jammy AS final
+FROM mcr.microsoft.com/dotnet/aspnet:7.0@sha256:442e00363ed50e17c5104305b658d5d41cf857bbd9d81e9829bc70754169d995 AS final
 
 ARG BUILDOS
 ARG BUILDARCH
@@ -84,10 +69,10 @@ ARG TARGETARCH
 RUN echo ${TARGETOS}
 RUN echo ${TARGETARCH}
 
-
 # Installing procps on the container to enable debugging of .NET Core
 RUN apt-get update \
     && apt-get install -y unzip procps wget curl
+
 
 # Download and install the Datadog Tracer
 #ENV TRACER_VERSION=2.14.0
@@ -98,6 +83,14 @@ RUN mkdir -p /opt/datadog \
     && dpkg -i ./datadog-dotnet-apm_${TRACER_VERSION}_${TARGETARCH}.deb \
     && /opt/datadog/createLogPath.sh \
     && rm ./datadog-dotnet-apm_${TRACER_VERSION}_${TARGETARCH}.deb
+
+
+# renovate: datasource=github-releases depName=grpc-ecosystem/grpc-health-probe
+# RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
+    # wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
+    # chmod +x /bin/grpc_health_probe
+
+
 
 RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${TARGETARCH} && \

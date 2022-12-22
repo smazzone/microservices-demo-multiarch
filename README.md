@@ -3,8 +3,8 @@
 <img src="src/frontend/static/icons/Swagstore-Logo.svg" width="300" alt="Swagstore" />
 </p>
 
-## Release 0.4.1 - multiarch (amd and arm support)
-## Nov 2022
+## Release 0.5.0 - multiarch (amd and arm support)
+## Dec 2022
 
 <!-- ![Continuous Integration](https://github.com/GoogleCloudPlatform/microservices-demo/workflows/Continuous%20Integration%20-%20Main/Release/badge.svg) -->
 

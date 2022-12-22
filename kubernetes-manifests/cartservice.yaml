@@ -19,7 +19,7 @@ metadata:
   labels:
       tags.datadoghq.com/env: "dev-auto-inject"
       tags.datadoghq.com/service: "cartservice"
-      tags.datadoghq.com/version: "1.0"  
+      tags.datadoghq.com/version: "0.5.0"  
 spec:
   selector:
     matchLabels:
@@ -30,15 +30,11 @@ spec:
         app: cartservice
         tags.datadoghq.com/env: "dev-auto-inject"
         tags.datadoghq.com/service: "cartservice"
-        tags.datadoghq.com/version: "1.0"
+        tags.datadoghq.com/version: "0.5.0"
         admission.datadoghq.com/enabled: "true"
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
-      # volumes:
-      #   - hostPath:
-      #       path: /var/run/datadog/
-      #     name: apmsocketpath
       securityContext:
         fsGroup: 1000
         runAsGroup: 1000
@@ -54,36 +50,17 @@ spec:
           privileged: false
           # readOnlyRootFilesystem: true
         image: cartservice
-        # volumeMounts:
-        #   - name: apmsocketpath
-        #     mountPath: /var/run/datadog
         ports:
         - containerPort: 7070
         env:
-        # - name: DD_ENV
-        #   valueFrom:
-        #     fieldRef:
-        #       fieldPath: metadata.labels['tags.datadoghq.com/env']
-        # - name: DD_VERSION
-        #   valueFrom:
-        #     fieldRef:
-        #       fieldPath: metadata.labels['tags.datadoghq.com/version']
-        # - name: DD_SERVICE
-        #   valueFrom:
-        #     fieldRef:
-        #       fieldPath: metadata.labels['tags.datadoghq.com/service']
+        - name: REDIS_ADDR
+          value: "redis-cart:6379"
         - name: DD_LOGS_INJECTION
           value: "true"
         - name: DD_TRACE_SAMPLE_RATE
           value: "1"
         - name: DD_RUNTIME_METRICS_ENABLED
           value: "true"
-        - name: DD_KUBERNETES_POD_LABELS_AS_TAGS
-          value: '{"*":"kube_%%label%%"}'
-        - name: DD_KUBERNETES_POD_ANNOTATIONS_AS_TAGS
-          value: '{"*":"kube_%%annotation%%"}'
-        - name: REDIS_ADDR
-          value: "redis-cart:6379"
         resources:
           requests:
             cpu: 200m
@@ -91,15 +68,15 @@ spec:
           limits:
             cpu: 300m
             memory: 128Mi
-        # readinessProbe:
-        #   initialDelaySeconds: 15
-        #   exec:
-        #     command: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
-        # livenessProbe:
-        #   initialDelaySeconds: 15
-        #   periodSeconds: 10
-        #   exec:
-        #     command: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
+        readinessProbe:
+          initialDelaySeconds: 15
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
+        livenessProbe:
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
 ---
 apiVersion: v1
 kind: Service

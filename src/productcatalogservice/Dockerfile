@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM --platform=$BUILDPLATFORM golang:1.19.3-alpine AS builder
+# FROM golang:1.19.4-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:1.19.4-alpine AS builder
 RUN apk add --no-cache ca-certificates git
 RUN apk add build-base
 
@@ -35,7 +36,7 @@ RUN echo ${TARGETARCH}
 ARG SKAFFOLD_GO_GCFLAGS
 RUN GOOS=$TARGETOS GOARCH=$TARGETARCH go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /productcatalogservice .
 
-FROM alpine:3.16.2 AS without-grpc-health-probe-bin
+FROM alpine:3.17.0 AS without-grpc-health-probe-bin
 RUN apk add --no-cache ca-certificates
 
 WORKDIR /src
@@ -51,28 +52,15 @@ EXPOSE 3550
 ENTRYPOINT ["/src/server"]
 
 FROM without-grpc-health-probe-bin
+# renovate: datasource=github-releases depName=grpc-ecosystem/grpc-health-probe
 # RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
-#     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-arm64 && \
-#     chmod +x /bin/grpc_health_probe
-
-# "change to ARCH=arm if you are on M1 or ARCH=amd if your are on Intel"
-# ARG ARCH=arm
-# RUN echo $ARCH
-# # ENV ARCH=arm
-# # RUN echo $ARCH
-
-# RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
-#     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${ARCH}64 && \
+#     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
 #     chmod +x /bin/grpc_health_probe
 
 ARG TARGETOS 
 ARG TARGETARCH
 RUN echo ${TARGETOS}
 RUN echo ${TARGETARCH}
-
-# RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
-#     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${ARCH}64 && \
-#     chmod +x /bin/grpc_health_probe
 
 RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${TARGETARCH} && \

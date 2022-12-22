@@ -12,7 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM --platform=$BUILDPLATFORM node:18.12.1-alpine as base
+# FROM node:19.3.0-alpine@sha256:d0b02b1ec5534efb43a926069915c982aec745a8eb0611ebcffc4cafaa4e4a74 as base
+
+# FROM base as builder
+
+FROM --platform=$BUILDPLATFORM node:19.3.0-alpine as base
 
 FROM --platform=$BUILDPLATFORM base as builder
 
@@ -43,19 +47,9 @@ ENTRYPOINT [ "node", "server.js" ]
 
 FROM without-grpc-health-probe-bin
 
+# renovate: datasource=github-releases depName=grpc-ecosystem/grpc-health-probe
 # RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
-#     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-arm64 && \
-#     chmod +x /bin/grpc_health_probe
-
-# "change to ARCH=arm if you are on M1 or ARCH=amd if your are on Intel"
-# ARG ARCH=arm
-# RUN echo $ARCH
-# ENV ARCH=arm
-# RUN echo $ARCH
-
-
-# RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
-#     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${ARCH}64 && \
+#     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
 #     chmod +x /bin/grpc_health_probe
 
 ARG TARGETOS 

@@ -19,7 +19,7 @@ metadata:
   labels:
       tags.datadoghq.com/env: "dev-auto-inject"
       tags.datadoghq.com/service: "recommendationservice"
-      tags.datadoghq.com/version: "1.0"
+      tags.datadoghq.com/version: "0.5.0"
 spec:
   selector:
     matchLabels:
@@ -30,10 +30,10 @@ spec:
         app: recommendationservice
         tags.datadoghq.com/env: "dev-auto-inject"
         tags.datadoghq.com/service: "recommendationservice"
-        tags.datadoghq.com/version: "1.0"
+        tags.datadoghq.com/version: "0.5.0"
         admission.datadoghq.com/enabled: "true"
       annotations:
-        admission.datadoghq.com/python-lib.version: "v1.6.0"
+        admission.datadoghq.com/python-lib.version: "v1.6.3"
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
@@ -50,31 +50,19 @@ spec:
         #     drop:
         #       - all
         #   privileged: false
-          # readOnlyRootFilesystem: true
+        #   readOnlyRootFilesystem: true
         image: recommendationservice
         ports:
         - containerPort: 8080
-        # readinessProbe:
-        #   periodSeconds: 5
-        #   exec:
-        #     command: ["/bin/grpc_health_probe", "-addr=:8080"]
-        # livenessProbe:
-        #   periodSeconds: 5
-        #   exec:
-        #     command: ["/bin/grpc_health_probe", "-addr=:8080"]
+        readinessProbe:
+          periodSeconds: 5
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:8080"]
+        livenessProbe:
+          periodSeconds: 5
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:8080"]
         env:
-        - name: DD_GRPC_SERVICE
-          value: "recommendationservice"
-        - name: DD_PROFILING_ENABLED
-          value: "true"
-        - name: DD_LOGS_INJECTION
-          value: "true"
-        - name: DD_TRACE_SAMPLE_RATE
-          value: "1"
-        - name: DD_KUBERNETES_POD_LABELS_AS_TAGS
-          value: '{"*":"kube_%%label%%"}'
-        - name: DD_KUBERNETES_POD_ANNOTATIONS_AS_TAGS
-          value: '{"*":"kube_%%annotation%%"}'
         - name: PORT
           value: "8080"
         - name: PRODUCT_CATALOG_SERVICE_ADDR
@@ -82,6 +70,16 @@ spec:
         - name: DISABLE_PROFILER
           value: "1"
         - name: DISABLE_DEBUGGER
+          value: "1"
+        - name: ENABLE_TRACING
+          value: "0"
+        - name: DD_GRPC_SERVICE
+          value: "recommendationservice"
+        - name: DD_PROFILING_ENABLED
+          value: "true"
+        - name: DD_LOGS_INJECTION
+          value: "true"
+        - name: DD_TRACE_SAMPLE_RATE
           value: "1"
         resources:
           requests:
