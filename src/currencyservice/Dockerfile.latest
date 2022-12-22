@@ -12,16 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM --platform=$BUILDPLATFORM node:18.12.1-alpine as base
+FROM node:18.12.1-alpine as base
 
-FROM --platform=$BUILDPLATFORM base as builder
+FROM base as builder
 
 # Some packages (e.g. @google-cloud/profiler) require additional
 # deps for post-install scripts
 RUN apk add --update --no-cache \
     python3 \
     make \
-    g++ 
+    g++
 
 WORKDIR /usr/src/app
 
@@ -37,9 +37,9 @@ COPY --from=builder /usr/src/app/node_modules ./node_modules
 
 COPY . .
 
-EXPOSE 50051
+EXPOSE 7000
 
-ENTRYPOINT [ "node", "index.js" ]
+ENTRYPOINT [ "node", "server.js" ]
 
 FROM without-grpc-health-probe-bin
 
@@ -48,20 +48,11 @@ FROM without-grpc-health-probe-bin
 #     chmod +x /bin/grpc_health_probe
 
 # "change to ARCH=arm if you are on M1 or ARCH=amd if your are on Intel"
-# ARG ARCH=arm
+ARG ARCH=arm
+RUN echo $ARCH
+# ENV ARCH=arm
 # RUN echo $ARCH
-# # ENV ARCH=arm
-# # RUN echo $ARCH
-
-# RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
-#     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${ARCH}64 && \
-#     chmod +x /bin/grpc_health_probe
-
-ARG TARGETOS 
-ARG TARGETARCH
-RUN echo ${TARGETOS}
-RUN echo ${TARGETARCH}
 
 RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
-    wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${TARGETARCH} && \
+    wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${ARCH}64 && \
     chmod +x /bin/grpc_health_probe

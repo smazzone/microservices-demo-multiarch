@@ -47,7 +47,8 @@ build:
   tagPolicy:
     gitCommit: {}
   local:
-    useBuildkit: false
+    # useBuildkit: false
+    useBuildkit: true
 manifests:
   kustomize:
     paths:
