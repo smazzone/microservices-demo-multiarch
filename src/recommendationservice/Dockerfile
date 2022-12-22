@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM --platform=$BUILDPLATFORM python:3.9.15-slim as base
+# FROM python:3.10.8-slim@sha256:49749648f4426b31b20fca55ad854caa55ff59dc604f2f76b57d814e0a47c181 as base
+
+FROM --platform=$BUILDPLATFORM python:3.10.8-slim as base
 
 FROM base as builder
 
@@ -21,25 +23,16 @@ RUN apt-get -qq update \
         wget g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# download the grpc health probe
-# RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
-#     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-arm64 && \
-#     chmod +x /bin/grpc_health_probe
-
-# "change to ARCH=arm if you are on M1 or ARCH=amd if your are on Intel"
-# ARG ARCH=arm
-# RUN echo $ARCH
-# # ENV ARCH=arm
-# # RUN echo $ARCH
-
-# RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
-#     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${ARCH}64 && \
-#     chmod +x /bin/grpc_health_probe
-
 ARG TARGETOS 
 ARG TARGETARCH
 RUN echo ${TARGETOS}
 RUN echo ${TARGETARCH}
+
+# download the grpc health probe
+# renovate: datasource=github-releases depName=grpc-ecosystem/grpc-health-probe
+# RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
+#     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
+#     chmod +x /bin/grpc_health_probe
 
 RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${TARGETARCH} && \
@@ -57,7 +50,7 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /recommendationservice
 
 # Grab packages from builder
-COPY --from=builder /usr/local/lib/python3.9/ /usr/local/lib/python3.9/
+COPY --from=builder /usr/local/lib/python3.10/ /usr/local/lib/python3.10/
 
 # Add the application
 COPY . .

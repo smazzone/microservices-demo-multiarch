@@ -47,14 +47,12 @@ spec:
               - all
           privileged: false
           readOnlyRootFilesystem: true
-        image: gcr.io/google-samples/microservices-demo/emailservice:v0.4.1
+        image: gcr.io/google-samples/microservices-demo/emailservice:v0.5.0
         ports:
         - containerPort: 8080
         env:
         - name: PORT
           value: "8080"
-        - name: DISABLE_TRACING
-          value: "1"
         - name: DISABLE_PROFILER
           value: "1"
         readinessProbe:
@@ -114,7 +112,7 @@ spec:
                 - all
             privileged: false
             readOnlyRootFilesystem: true
-          image: gcr.io/google-samples/microservices-demo/checkoutservice:v0.4.1
+          image: gcr.io/google-samples/microservices-demo/checkoutservice:v0.5.0
           ports:
           - containerPort: 5050
           readinessProbe:
@@ -138,12 +136,6 @@ spec:
             value: "currencyservice:7000"
           - name: CART_SERVICE_ADDR
             value: "cartservice:7070"
-          - name: DISABLE_STATS
-            value: "1"
-          - name: DISABLE_TRACING
-            value: "1"
-          - name: DISABLE_PROFILER
-            value: "1"
           resources:
             requests:
               cpu: 100m
@@ -194,7 +186,7 @@ spec:
               - all
           privileged: false
           readOnlyRootFilesystem: true
-        image: gcr.io/google-samples/microservices-demo/recommendationservice:v0.4.1
+        image: gcr.io/google-samples/microservices-demo/recommendationservice:v0.5.0
         ports:
         - containerPort: 8080
         readinessProbe:
@@ -210,11 +202,7 @@ spec:
           value: "8080"
         - name: PRODUCT_CATALOG_SERVICE_ADDR
           value: "productcatalogservice:3550"
-        - name: DISABLE_TRACING
-          value: "1"
         - name: DISABLE_PROFILER
-          value: "1"
-        - name: DISABLE_DEBUGGER
           value: "1"
         resources:
           requests:
@@ -267,7 +255,7 @@ spec:
                 - all
             privileged: false
             readOnlyRootFilesystem: true
-          image: gcr.io/google-samples/microservices-demo/frontend:v0.4.1
+          image: gcr.io/google-samples/microservices-demo/frontend:v0.5.0
           ports:
           - containerPort: 8080
           readinessProbe:
@@ -307,10 +295,8 @@ spec:
           # # When not set, defaults to "local" unless running in GKE, otherwies auto-sets to gcp 
           # - name: ENV_PLATFORM 
           #   value: "aws"
-          - name: DISABLE_TRACING
-            value: "1"
-          - name: DISABLE_PROFILER
-            value: "1"
+          - name: ENABLE_PROFILER
+            value: "0"
           # - name: CYMBAL_BRANDING
           #   value: "true"
           resources:
@@ -376,17 +362,13 @@ spec:
               - all
           privileged: false
           readOnlyRootFilesystem: true
-        image: gcr.io/google-samples/microservices-demo/paymentservice:v0.4.1
+        image: gcr.io/google-samples/microservices-demo/paymentservice:v0.5.0
         ports:
         - containerPort: 50051
         env:
         - name: PORT
           value: "50051"
-        - name: DISABLE_TRACING
-          value: "1"
         - name: DISABLE_PROFILER
-          value: "1"
-        - name: DISABLE_DEBUGGER
           value: "1"
         readinessProbe:
           exec:
@@ -444,16 +426,12 @@ spec:
               - all
           privileged: false
           readOnlyRootFilesystem: true
-        image: gcr.io/google-samples/microservices-demo/productcatalogservice:v0.4.1
+        image: gcr.io/google-samples/microservices-demo/productcatalogservice:v0.5.0
         ports:
         - containerPort: 3550
         env:
         - name: PORT
           value: "3550"
-        - name: DISABLE_STATS
-          value: "1"
-        - name: DISABLE_TRACING
-          value: "1"
         - name: DISABLE_PROFILER
           value: "1"
         readinessProbe:
@@ -512,7 +490,7 @@ spec:
               - all
           privileged: false
           readOnlyRootFilesystem: true
-        image: gcr.io/google-samples/microservices-demo/cartservice:v0.4.1
+        image: gcr.io/google-samples/microservices-demo/cartservice:v0.5.0
         ports:
         - containerPort: 7070
         env:
@@ -604,7 +582,7 @@ spec:
               - all
           privileged: false
           readOnlyRootFilesystem: true
-        image: gcr.io/google-samples/microservices-demo/loadgenerator:v0.4.1
+        image: gcr.io/google-samples/microservices-demo/loadgenerator:v0.5.0
         env:
         - name: FRONTEND_ADDR
           value: "frontend:80"
@@ -647,18 +625,14 @@ spec:
               - all
           privileged: false
           readOnlyRootFilesystem: true
-        image: gcr.io/google-samples/microservices-demo/currencyservice:v0.4.1
+        image: gcr.io/google-samples/microservices-demo/currencyservice:v0.5.0
         ports:
         - name: grpc
           containerPort: 7000
         env:
         - name: PORT
           value: "7000"
-        - name: DISABLE_TRACING
-          value: "1"
         - name: DISABLE_PROFILER
-          value: "1"
-        - name: DISABLE_DEBUGGER
           value: "1"
         readinessProbe:
           exec:
@@ -715,16 +689,12 @@ spec:
               - all
           privileged: false
           readOnlyRootFilesystem: true
-        image: gcr.io/google-samples/microservices-demo/shippingservice:v0.4.1
+        image: gcr.io/google-samples/microservices-demo/shippingservice:v0.5.0
         ports:
         - containerPort: 50051
         env:
         - name: PORT
           value: "50051"
-        - name: DISABLE_STATS
-          value: "1"
-        - name: DISABLE_TRACING
-          value: "1"
         - name: DISABLE_PROFILER
           value: "1"
         readinessProbe:
@@ -849,16 +819,12 @@ spec:
               - all
           privileged: false
           readOnlyRootFilesystem: true
-        image: gcr.io/google-samples/microservices-demo/adservice:v0.4.1
+        image: gcr.io/google-samples/microservices-demo/adservice:v0.5.0
         ports:
         - containerPort: 9555
         env:
         - name: PORT
           value: "9555"
-        - name: DISABLE_STATS
-          value: "1"
-        - name: DISABLE_TRACING
-          value: "1"
         resources:
           requests:
             cpu: 200m

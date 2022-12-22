@@ -44,6 +44,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
@@ -98,7 +99,6 @@ func main() {
 		log.Fatal(err)
 	}
 	defer profiler.Stop()
-
 	if os.Getenv("ENABLE_TRACING") == "1" {
 		err := initTracing()
 		if err != nil {
@@ -158,22 +158,19 @@ func run(port string) string {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// Create the server interceptor using the grpc trace package.
-	si := grpctrace.StreamServerInterceptor(grpctrace.WithServiceName("productcatalogservice"))
-	ui := grpctrace.UnaryServerInterceptor(grpctrace.WithServiceName("productcatalogservice"))
-
 	var srv *grpc.Server
-	// if os.Getenv("ENABLE_TRACING") == "1" {
-	// 	srv = grpc.NewServer(
-	// 		grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()),
-	// 		grpc.StreamInterceptor(otelgrpc.StreamServerInterceptor()))
-	srv = grpc.NewServer(
-		grpc.UnaryInterceptor(ui),
-		grpc.StreamInterceptor(si))
-	// } else {
-	// 	srv = grpc.NewServer()
-	// }
+	if os.Getenv("ENABLE_TRACING") == "1" {
+		srv = grpc.NewServer(
+			grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()),
+			grpc.StreamInterceptor(otelgrpc.StreamServerInterceptor()))
+	} else {
+		// Create the server interceptor using the grpc trace package.
+		si := grpctrace.StreamServerInterceptor(grpctrace.WithServiceName("productcatalogservice"))
+		ui := grpctrace.UnaryServerInterceptor(grpctrace.WithServiceName("productcatalogservice"))
+		srv = grpc.NewServer(
+			grpc.UnaryInterceptor(ui),
+			grpc.StreamInterceptor(si))
+	}
 
 	svc := &productCatalog{}
 
@@ -313,25 +310,23 @@ func mustMapEnv(target *string, envKey string) {
 }
 
 func mustConnGRPC(ctx context.Context, conn **grpc.ClientConn, addr string) {
-	// Create the client interceptor using the grpc trace package.
-	si := grpctrace.StreamClientInterceptor(grpctrace.WithServiceName("productcatalogservice"))
-	ui := grpctrace.UnaryClientInterceptor(grpctrace.WithServiceName("productcatalogservice"))
 	var err error
 	ctx, cancel := context.WithTimeout(ctx, time.Second*3)
 	defer cancel()
-	// if os.Getenv("ENABLE_TRACING") == "1" {
-	// 	*conn, err = grpc.DialContext(ctx, addr,
-	// 		grpc.WithInsecure(),
-	// 		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
-	// 		grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor()))
-	*conn, err = grpc.DialContext(ctx, addr,
-		grpc.WithInsecure(),
-		grpc.WithUnaryInterceptor(ui),
-		grpc.WithStreamInterceptor(si))
-	// } else {
-	// 	*conn, err = grpc.DialContext(ctx, addr,
-	// 		grpc.WithInsecure())
-	// }
+	if os.Getenv("ENABLE_TRACING") == "1" {
+		*conn, err = grpc.DialContext(ctx, addr,
+			grpc.WithInsecure(),
+			grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
+			grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor()))
+	} else {
+		// Create the client interceptor using the grpc trace package.
+		si := grpctrace.StreamClientInterceptor(grpctrace.WithServiceName("productcatalogservice"))
+		ui := grpctrace.UnaryClientInterceptor(grpctrace.WithServiceName("productcatalogservice"))
+		*conn, err = grpc.DialContext(ctx, addr,
+			grpc.WithInsecure(),
+			grpc.WithUnaryInterceptor(ui),
+			grpc.WithStreamInterceptor(si))
+	}
 	if err != nil {
 		panic(errors.Wrapf(err, "grpc: failed to connect %s", addr))
 	}

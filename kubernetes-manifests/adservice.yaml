@@ -19,7 +19,7 @@ metadata:
   labels:
       tags.datadoghq.com/env: "dev-auto-inject"
       tags.datadoghq.com/service: "adservice"
-      tags.datadoghq.com/version: "1.0"
+      tags.datadoghq.com/version: "0.5.0"
 spec:
   selector:
     matchLabels:
@@ -30,10 +30,10 @@ spec:
         app: adservice
         tags.datadoghq.com/env: "dev-auto-inject"
         tags.datadoghq.com/service: "adservice"
-        tags.datadoghq.com/version: "1.0"
+        tags.datadoghq.com/version: "0.5.0"
         admission.datadoghq.com/enabled: "true"
       annotations:
-        admission.datadoghq.com/java-lib.version: "v0.115.0"
+        admission.datadoghq.com/java-lib.version: "v1.3.0"
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
@@ -50,13 +50,19 @@ spec:
             drop:
               - all
           privileged: false
-          # readOnlyRootFilesystem: true
+        #   readOnlyRootFilesystem: true
         image: adservice
         ports:
         - containerPort: 9555
         env:
         - name: PORT
           value: "9555"
+        - name: DISABLE_STATS
+          value: "1"
+        - name: DISABLE_TRACING
+          value: "1"
+        - name: DISABLE_PROFILER
+          value: "1"
         - name: DD_PROFILING_ENABLED
           value: "true"
         - name: DD_LOGS_INJECTION
@@ -65,10 +71,6 @@ spec:
           value: "1"
         - name: DD_INVENTORIES_CONFIGURATION_ENABLED
           value: "true"
-        - name: DD_KUBERNETES_POD_LABELS_AS_TAGS
-          value: '{"*":"kube_%%label%%"}'
-        - name: DD_KUBERNETES_POD_ANNOTATIONS_AS_TAGS
-          value: '{"*":"kube_%%annotation%%"}'
         resources:
           requests:
             cpu: 200m
@@ -76,16 +78,16 @@ spec:
           limits:
             cpu: 300m
             memory: 300Mi
-        # readinessProbe:
-        #   initialDelaySeconds: 20
-        #   periodSeconds: 15
-        #   exec:
-        #     command: ["/bin/grpc_health_probe", "-addr=:9555"]
-        # livenessProbe:
-        #   initialDelaySeconds: 20
-        #   periodSeconds: 15
-        #   exec:
-        #     command: ["/bin/grpc_health_probe", "-addr=:9555"]
+        readinessProbe:
+          initialDelaySeconds: 40
+          periodSeconds: 15
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:9555"]
+        livenessProbe:
+          initialDelaySeconds: 40
+          periodSeconds: 15
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:9555"]
 ---
 apiVersion: v1
 kind: Service
