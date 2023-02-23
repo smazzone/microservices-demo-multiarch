@@ -67,6 +67,8 @@ spec:
           value: "1"
         - name: DD_PROFILING_ENABLED
           value: "true"
+        - name: DD_RUNTIME_METRICS_ENABLED
+          value: "true"
         # readinessProbe:
         #   exec:
         #     command: ["/bin/grpc_health_probe", "-addr=:50051"]
