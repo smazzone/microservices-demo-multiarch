@@ -1,0 +1,31 @@
+nameOverride: datadog-agent
+fullnameOverride: datadog-agent
+targetSystem: "linux"
+
+commonLabels: {
+  env: dev,
+  team_name: dash2023
+}
+
+registry: gcr.io/datadoghq
+
+datadog:
+  logs:
+    enabled: true
+    containerCollectAll: true
+  collectEvents: true
+  networkMonitoring:
+    enabled: true
+  processAgent:
+    enabled: true
+  orchestratorExplorer:
+    enabled: true
+  # logLevel: info
+  tags: {}
+
+clusterAgent:
+  enabled: true
+  rbac:
+    create: true
+  replicas: 2
+  createPodDisruptionBudget: true
