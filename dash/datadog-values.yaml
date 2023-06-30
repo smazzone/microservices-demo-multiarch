@@ -10,6 +10,8 @@ commonLabels: {
 registry: gcr.io/datadoghq
 
 datadog:
+  apiKeyExistingSecret: datadog-secret
+  appKeyExistingSecret: datadog-secret
   logs:
     enabled: true
     containerCollectAll: true
