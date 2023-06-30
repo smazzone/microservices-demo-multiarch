@@ -2,10 +2,10 @@ nameOverride: datadog-agent
 fullnameOverride: datadog-agent
 targetSystem: "linux"
 
-commonLabels: {
-  env: dev,
-  team_name: dash2023
-}
+commonLabels: 
+  - env: dev,
+  - team_name: dash2023
+
 
 registry: gcr.io/datadoghq
 
@@ -23,7 +23,7 @@ datadog:
   orchestratorExplorer:
     enabled: true
   # logLevel: info
-  tags: {}
+  tags: 
 
 clusterAgent:
   enabled: true
