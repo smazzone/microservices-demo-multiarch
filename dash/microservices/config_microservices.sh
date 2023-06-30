@@ -37,10 +37,17 @@ curl -sSL https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 
 # Git clone project
 git clone https://github.com/kepicorp/microservices-demo-multiarch.git
 
+# Add API KEY and APP KEY to kubectl secrets
+DD_API_KEY=""
+DD_APP_KEY=""
+kubectl create secret generic datadog-secret --from-literal api-key=$DD_API_KEY --from-literal app-key=$DD_APP_KEY
+
+
 # Install agent
 helm repo add datadog https://helm.datadoghq.com
 helm repo update
 helm install datadog-agent -f dash/datadog-values.yaml datadog/datadog
 
 
-# Skaffold build
+# Skaffold build and run
+skaffold run --platform=linux/amd64

@@ -2,10 +2,10 @@ nameOverride: datadog-agent
 fullnameOverride: datadog-agent
 targetSystem: "linux"
 
-commonLabels: 
+commonLabels: {
   env: dev,
   team_name: dash2023
-
+}
 
 registry: gcr.io/datadoghq
 
