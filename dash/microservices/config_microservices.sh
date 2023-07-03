@@ -29,7 +29,7 @@ sudo yum install -y git
 # Install Skaffold
 sudo curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
 sudo install skaffold /usr/local/bin/
-rm skaffold
+rm -f skaffold
 
 # install helm
 curl -sSL https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
@@ -46,8 +46,10 @@ kubectl create secret generic datadog-secret --from-literal api-key=$DD_API_KEY 
 # Install agent
 helm repo add datadog https://helm.datadoghq.com
 helm repo update
-helm install datadog-agent -f dash/datadog-values.yaml datadog/datadog
-
 
 # Skaffold build and run
+skaffold build --platform=linux/amd64
 skaffold run --platform=linux/amd64
+
+# Start agent with datadog-values.yaml
+helm install datadog-agent -f dash/datadog-values.yaml datadog/datadog
