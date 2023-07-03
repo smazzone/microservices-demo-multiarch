@@ -6,7 +6,7 @@
 ## ONLY SET THE VALUES YOU WANT TO OVERRIDE IN YOUR values.yaml.
 
 # nameOverride -- Override name of app
-nameOverride:  # ""
+nameOverride:  "datadog-agent"
 
 # fullnameOverride -- Override the full qualified app name
 fullnameOverride:  # ""
