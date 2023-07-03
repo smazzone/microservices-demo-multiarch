@@ -40,8 +40,11 @@ git clone https://github.com/kepicorp/microservices-demo-multiarch.git
 # Add API KEY and APP KEY to kubectl secrets
 DD_API_KEY=""
 DD_APP_KEY=""
-kubectl create secret generic datadog-secret --from-literal api-key=$DD_API_KEY --from-literal app-key=$DD_APP_KEY
+kubectl create secret generic datadog-secret --from-literal=api-key=$DD_API_KEY --from-literal=app-key=$DD_APP_KEY
 
+# Set hostname
+TEAM_NAME=bits
+sudo hostnamectl set-hostname $TEAM_NAME-dash2023
 
 # Install agent
 helm repo add datadog https://helm.datadoghq.com
@@ -52,4 +55,4 @@ skaffold build --platform=linux/amd64
 skaffold run --platform=linux/amd64
 
 # Start agent with datadog-values.yaml
-helm install datadog-agent -f dash/datadog-values.yaml datadog/datadog
+helm install datadog-agent -f dash/datadog-values.yaml datadog/datadog --set datadog.apiKey=$DD_API_KEY

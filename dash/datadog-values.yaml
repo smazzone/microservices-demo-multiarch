@@ -24,6 +24,13 @@ datadog:
     enabled: true
   # logLevel: info
   tags: 
+  kubelet:
+    tlsVerify: false
+  #env:
+  #  - name: DD_HOSTNAME
+  #    valueFrom:
+  #      fieldRef:
+  #        fieldPath: spec.nodeName
 
 clusterAgent:
   enabled: true
