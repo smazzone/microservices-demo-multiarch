@@ -21,6 +21,7 @@ datadog:
     enabled: true
   processAgent:
     enabled: true
+    processCollection: true
   orchestratorExplorer:
     enabled: true
   # logLevel: info
@@ -67,3 +68,5 @@ clusterAgent:
     create: true
   replicas: 2
   createPodDisruptionBudget: true
+  admissionController:
+    enabled: true
