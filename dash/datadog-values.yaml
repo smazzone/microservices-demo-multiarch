@@ -7,11 +7,10 @@ commonLabels: {
   team_name: dash2023
 }
 
-registry: gcr.io/datadoghq
 
 datadog:
-  apiKeyExistingSecret: datadog-secret
-  appKeyExistingSecret: datadog-secret
+  #apiKeyExistingSecret: datadog-secret
+  #appKeyExistingSecret: datadog-secret
   # Enable Log collections
   logs:
     enabled: true
@@ -66,7 +65,7 @@ clusterAgent:
   enabled: true
   rbac:
     create: true
-  replicas: 2
-  createPodDisruptionBudget: true
+  replicas: 1
+  createPodDisruptionBudget: false
   admissionController:
     enabled: true
