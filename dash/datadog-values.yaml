@@ -81,7 +81,8 @@ datadog:
       valueFrom:
         fieldRef:
           fieldPath: status.hostIP
-    # tlsVerify: false
+  # Enable data to be sent with invalid certs (required for kind cluster)
+    tlsVerify: false
 
   ## Set up global environment for agent and pods communication
   env:
