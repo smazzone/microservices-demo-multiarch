@@ -1,71 +1,114 @@
+###
+## Datadog Agent and Cluster Helm Configuration
+###
+
+## Naming and Traget Architecture
 nameOverride: datadog-agent
 fullnameOverride: datadog-agent
 targetSystem: "linux"
 
-commonLabels: {
-  env: dev,
-  team_name: dash2023
-}
+clusterAgent:
+  ## The Datadog Cluster Agent provides a streamlined, centralized approach to collecting cluster level monitoring data. 
+  ## Datadog strongly recommends using the Cluster Agent for monitoring Kubernetes.
+  enabled: true
+  rbac:
+    create: true
 
+  ## Admission Controller for on the flight tagging
+  admissionController:
+    enabled: false
 
+  ## Custom metrics server
+  metricsProvider:
+    enabled: true
+  
+  ## Enable replications required for Admission Controller and Metrics Provider
+  # replicas: 2
+  # createPodDisruptionBudget: true
+ 
 datadog:
+  ## Set APIkey and APPKey Optionally the site
   apiKeyExistingSecret: datadog-secret
   appKeyExistingSecret: datadog-secret
-  # Enable Log collections
+  # site: <DATADOG_SITE>
+  ## Set log level
+  # logLevel: info
+  ## Set global tags
+  # tags: 
+
+  ## Enable Log collections
   logs:
     enabled: true
     containerCollectAll: true
+
+  ## Collect kubernetes events
   collectEvents: true
+
+  ## Enable Network Performance monitoring
   networkMonitoring:
     enabled: true
+
+  ## Enable process collection
+  # If can't detect cluster name:
+  # clusterName: <YOUR_CLUSTER_NAME>
   processAgent:
     enabled: true
     processCollection: true
+
+  ## Enable Orchestration Explorer
   orchestratorExplorer:
     enabled: true
-  # logLevel: info
-  tags: 
-  kubelet:
-    tlsVerify: false
-  env:
-    - name: DD_HOSTNAME
-      valueFrom:
-        fieldRef:
-          fieldPath: spec.nodeName
-  # Enable APM
+
+  ## Enable APM
   apm:
     socketEnabled: true
     portEnabled: true
 
-  ## OTLP ingest related configuration
-  otlp:
-    receiver:
-      protocols:
-        # datadog.otlp.receiver.protocols.grpc - OTLP/gRPC configuration
-        grpc:
-          # datadog.otlp.receiver.protocols.grpc.enabled -- Enable the OTLP/gRPC endpoint
-          enabled: false
-          # datadog.otlp.receiver.protocols.grpc.endpoint -- OTLP/gRPC endpoint
-          endpoint: "0.0.0.0:4317"
-          # datadog.otlp.receiver.protocols.grpc.useHostPort -- Enable the Host Port for the OTLP/gRPC endpoint
-          useHostPort: true
-
-        # datadog.otlp.receiver.protocols.http - OTLP/HTTP configuration
-        http:
-          # datadog.otlp.receiver.protocols.http.enabled -- Enable the OTLP/HTTP endpoint
-          enabled: false
-          # datadog.otlp.receiver.protocols.http.endpoint -- OTLP/HTTP endpoint
-          endpoint: "0.0.0.0:4318"
-          # datadog.otlp.receiver.protocols.http.useHostPort -- Enable the Host Port for the OTLP/HTTP endpoint
-          useHostPort: true
-
-
-
-clusterAgent:
-  enabled: true
-  rbac:
-    create: true
-  replicas: 1
-  createPodDisruptionBudget: false
-  admissionController:
+  ## Enable APM  Remote configuration
+  remote_configuration:
     enabled: true
+
+  ## Enable Cloud Security Posture Management and Cloud Workload Security
+  securityAgent:
+    runtime:
+      enabled: true
+    compliance:
+      enabled: true
+
+  ## Set up kubelet communication configuration
+  kubelet:
+    host:
+      valueFrom:
+        fieldRef:
+          fieldPath: status.hostIP
+    # tlsVerify: false
+
+  ## Set up global environment for agent and pods communication
+  env:
+    # - name: DD_HOSTNAME
+    #   valueFrom:
+    #     fieldRef:
+    #       fieldPath: spec.nodeName
+
+  ## OTLP ingest related configuration
+  # otlp:
+  #   enabled: true
+  #   receiver:
+  #     protocols:
+  #       # datadog.otlp.receiver.protocols.grpc - OTLP/gRPC configuration
+  #       grpc:
+  #         # datadog.otlp.receiver.protocols.grpc.enabled -- Enable the OTLP/gRPC endpoint
+  #         enabled: false
+  #         # datadog.otlp.receiver.protocols.grpc.endpoint -- OTLP/gRPC endpoint
+  #         endpoint: "0.0.0.0:4317"
+  #         # datadog.otlp.receiver.protocols.grpc.useHostPort -- Enable the Host Port for the OTLP/gRPC endpoint
+  #         useHostPort: true
+  #       # datadog.otlp.receiver.protocols.http - OTLP/HTTP configuration
+  #       http:
+  #         # datadog.otlp.receiver.protocols.http.enabled -- Enable the OTLP/HTTP endpoint
+  #         enabled: false
+  #         # datadog.otlp.receiver.protocols.http.endpoint -- OTLP/HTTP endpoint
+  #         endpoint: "0.0.0.0:4318"
+  #         # datadog.otlp.receiver.protocols.http.useHostPort -- Enable the Host Port for the OTLP/HTTP endpoint
+  #         useHostPort: true
+

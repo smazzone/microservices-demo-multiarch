@@ -29,3 +29,27 @@ DD_API_KEY=
 DD_APP_KEY=
 TEAM_NAME=""
 ```
+
+## Add from Instruqt training
+
+[Look at this bootstrap and inspire for K8s set up](https://github.com/DataDog/training-images/blob/main/instruqt-k8s/bootstrap.sh)
+
+## TODO
+
+* Redis integration monitoring https://docs.datadoghq.com/containers/kubernetes/integrations/?tab=helm
+* Expose 80
+* Logs and traces correlation
+* Live process
+* Continues profiler
+* Enable ASM 
+```yaml
+spec:
+  template:
+    spec:
+      containers:
+        - name: <CONTAINER_NAME>
+          image: <CONTAINER_IMAGE>/<TAG>
+          env:
+            - name: DD_APPSEC_ENABLED
+              value: "true"
+```

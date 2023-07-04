@@ -16,7 +16,7 @@ chmod +x ./kind
 sudo mv ./kind /usr/local/bin/kind
 
 # Create k8s local cluster
-kind create cluster
+kind create cluster --config ./dash/microservices/kind-config.yaml
 
 ## Install minikube
 #sudo curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
@@ -50,9 +50,10 @@ sudo hostnamectl set-hostname $TEAM_NAME-dash2023
 helm repo add datadog https://helm.datadoghq.com
 helm repo update
 
+# Start agent with datadog-values.yaml
+helm install datadog-agent -f dash/datadog-values.yaml datadog/datadog --set datadog.apiKey=$DD_API_KEY
+
 # Skaffold build and run
 skaffold build --platform=linux/amd64
 skaffold run --platform=linux/amd64
 
-# Start agent with datadog-values.yaml
-helm install datadog-agent -f dash/datadog-values.yaml datadog/datadog --set datadog.apiKey=$DD_API_KEY

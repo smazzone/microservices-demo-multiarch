@@ -17,7 +17,7 @@ kind: Deployment
 metadata:
   name: frontend
   labels:
-    tags.datadoghq.com/env: "dev"
+    tags.datadoghq.com/env: "dev-auto-inject"
     tags.datadoghq.com/service: "frontend"
     tags.datadoghq.com/version: "1.0"
 spec:
@@ -28,7 +28,7 @@ spec:
     metadata:
       labels:
         app: frontend
-        tags.datadoghq.com/env: "dev"
+        tags.datadoghq.com/env: "ddev-auto-inject"
         tags.datadoghq.com/service: "frontend"
         tags.datadoghq.com/version: "1.0"
         admission.datadoghq.com/enabled: "true"
@@ -124,6 +124,20 @@ spec:
   - name: http
     port: 80
     targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-kind
+spec:
+  selector:
+    name: frontend
+  type: NodePort
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      nodePort: 30000
 ---
 apiVersion: v1
 kind: Service
