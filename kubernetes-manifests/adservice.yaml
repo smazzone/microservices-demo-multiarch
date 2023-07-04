@@ -71,6 +71,10 @@ spec:
           value: "1"
         - name: DD_INVENTORIES_CONFIGURATION_ENABLED
           value: "true"
+        - name: DD_AGENT_HOST
+          valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
         resources:
           requests:
             cpu: 200m

@@ -27,11 +27,11 @@ datadog:
   tags: 
   kubelet:
     tlsVerify: false
-  #env:
-  #  - name: DD_HOSTNAME
-  #    valueFrom:
-  #      fieldRef:
-  #        fieldPath: spec.nodeName
+  env:
+    - name: DD_HOSTNAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
   # Enable APM
   apm:
     socketEnabled: true
