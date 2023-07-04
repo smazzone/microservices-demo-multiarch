@@ -60,3 +60,5 @@ helm install datadog-agent -f dash/datadog-values.yaml datadog/datadog --set dat
 skaffold build --platform=linux/amd64
 skaffold run --platform=linux/amd64
 
+# Forward port 8080 to local machine
+kubectl port-forward deployment/frontend 8080:80
