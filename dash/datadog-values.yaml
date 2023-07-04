@@ -16,15 +16,15 @@ clusterAgent:
 
   ## Admission Controller for on the flight tagging
   admissionController:
-    enabled: false
+    enabled: true
 
   ## Custom metrics server
   metricsProvider:
     enabled: true
   
   ## Enable replications required for Admission Controller and Metrics Provider
-  # replicas: 2
-  # createPodDisruptionBudget: true
+  replicas: 2
+  createPodDisruptionBudget: true
  
 datadog:
   ## Set APIkey and APPKey Optionally the site
@@ -85,10 +85,10 @@ datadog:
 
   ## Set up global environment for agent and pods communication
   env:
-    # - name: DD_HOSTNAME
-    #   valueFrom:
-    #     fieldRef:
-    #       fieldPath: spec.nodeName
+    - name: DD_HOSTNAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
 
   ## OTLP ingest related configuration
   # otlp:
