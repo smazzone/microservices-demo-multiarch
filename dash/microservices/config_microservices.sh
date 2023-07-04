@@ -41,7 +41,7 @@ cd microservices-demo-multiarch
 kind create cluster --config ./dash/microservices/kind-config.yaml
 
 # Add API KEY and APP KEY to kubectl secrets
-DD_API_KEY="60946de18fab9775f974ea74a2f4fc1b"
+DD_API_KEY=""
 DD_APP_KEY=""
 kubectl create secret generic datadog-secret --from-literal=api-key=$DD_API_KEY --from-literal=app-key=$DD_APP_KEY
 
