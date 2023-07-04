@@ -29,8 +29,12 @@ DD_API_KEY=
 DD_APP_KEY=
 TEAM_NAME=""
 ```
+Get status from agent
+```bash
+datadog-agent-mrp4datadog-agent-mrp4s## Add from Instruqt training
+```
 
-## Add from Instruqt training
+## Instruqt inspiration 
 
 [Look at this bootstrap and inspire for K8s set up](https://github.com/DataDog/training-images/blob/main/instruqt-k8s/bootstrap.sh)
 
