@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # FROM golang:1.19.4-alpine@sha256:f33331e12ca70192c0dbab2d0a74a52e1dd344221507d88aaea605b0219a212f as builder
-FROM --platform=$BUILDPLATFORM golang:1.19.4-alpine as builder
+FROM --platform=$BUILDPLATFORM golang:1.20.5-alpine as builder
 
 RUN apk add --no-cache ca-certificates git
 RUN apk add build-base

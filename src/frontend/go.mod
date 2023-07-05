@@ -1,10 +1,10 @@
-module cloud.google.com/go/compute/metadata
+module github.com/GoogleCloudPlatform/microservices-demo/src/frontend
 
 go 1.20
 
 require (
+	cloud.google.com/go/compute/metadata v0.2.3
 	cloud.google.com/go/profiler v0.3.1
-	github.com/GoogleCloudPlatform/microservices-demo/src/frontend v0.0.0-20230704141020-9ee610cf07ce
 	github.com/golang/protobuf v1.5.3
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/mux v1.8.0
@@ -22,6 +22,7 @@ require (
 
 require (
 	cloud.google.com/go v0.110.0 // indirect
+	cloud.google.com/go/compute v1.19.1 // indirect
 	github.com/DataDog/appsec-internal-go v1.0.0 // indirect
 	github.com/DataDog/datadog-agent/pkg/obfuscate v0.45.0-rc.1 // indirect
 	github.com/DataDog/datadog-agent/pkg/remoteconfig/state v0.45.0 // indirect
