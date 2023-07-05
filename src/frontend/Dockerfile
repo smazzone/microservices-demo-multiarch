@@ -33,7 +33,7 @@ RUN echo ${TARGETARCH}
 ARG SKAFFOLD_GO_GCFLAGS
 # Adding APP SEC 
 ENV CGO_ENABLED=1
-RUN GOOS=$TARGETOS GOARCH=$TARGETARCH go build -tags appsec -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /go/bin/frontend .
+RUN GOOS=$TARGETOS GOARCH=$TARGETARCH go build -v -tags appsec -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /go/bin/frontend .
 
 FROM alpine:3.17.0 as release
 RUN apk add --no-cache ca-certificates \
