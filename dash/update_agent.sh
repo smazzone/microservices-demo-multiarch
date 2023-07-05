@@ -1,0 +1,1 @@
+helm upgrade -f dash/datadog-values.yaml datadog-agent datadog/datadog
