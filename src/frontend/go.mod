@@ -17,7 +17,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.11.2
 	golang.org/x/net v0.4.0
 	google.golang.org/grpc v1.51.0
-	gopkg.in/DataDog/dd-trace-go.v1 v1.43.1
+	gopkg.in/DataDog/dd-trace-go.v1 v1.52.0
 )
 
 require (
