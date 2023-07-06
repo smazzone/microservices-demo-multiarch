@@ -34,7 +34,8 @@ datadog:
   ## Set log level
   # logLevel: info
   ## Set global tags
-  # tags: 
+  tags:
+    - env: dash2023
 
   ## Enable Log collections
   logs:

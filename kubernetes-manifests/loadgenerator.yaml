@@ -15,6 +15,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: loadgenerator
+  labels:
+      tags.datadoghq.com/env: "dash2023"
+      tags.datadoghq.com/service: "loadgenerator"
+      tags.datadoghq.com/version: "1.0"
 spec:
   selector:
     matchLabels:

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # FROM golang:1.19.4-alpine@sha256:f33331e12ca70192c0dbab2d0a74a52e1dd344221507d88aaea605b0219a212f as builder
-FROM --platform=$BUILDPLATFORM golang:1.19.4-alpine as builder
+FROM --platform=$BUILDPLATFORM golang:1.20.5-alpine as builder
 
 RUN apk add --no-cache ca-certificates git
 RUN apk add build-base
@@ -31,7 +31,9 @@ RUN echo ${TARGETARCH}
 
 # Skaffold passes in debug-oriented compiler flags
 ARG SKAFFOLD_GO_GCFLAGS
-RUN GOOS=$TARGETOS GOARCH=$TARGETARCH go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /go/bin/frontend .
+# Adding APP SEC 
+ENV CGO_ENABLED=1
+RUN GOOS=$TARGETOS GOARCH=$TARGETARCH go build -v -tags appsec -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /go/bin/frontend .
 
 FROM alpine:3.17.0 as release
 RUN apk add --no-cache ca-certificates \

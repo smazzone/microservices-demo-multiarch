@@ -17,7 +17,7 @@ kind: Deployment
 metadata:
   name: emailservice
   labels:
-      tags.datadoghq.com/env: "dev-auto-inject"
+      tags.datadoghq.com/env: "dash2023"
       tags.datadoghq.com/service: "emailservice"
       tags.datadoghq.com/version: "0.5.0"
 spec:
@@ -28,7 +28,7 @@ spec:
     metadata:
       labels:
         app: emailservice
-        tags.datadoghq.com/env: "dev-auto-inject"
+        tags.datadoghq.com/env: "dash2023"
         tags.datadoghq.com/service: "emailservice"
         tags.datadoghq.com/version: "0.5.0"
         admission.datadoghq.com/enabled: "true"
