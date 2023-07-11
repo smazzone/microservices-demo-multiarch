@@ -65,4 +65,3 @@ kubectl port-forward deployment/frontend 8080:80
 # Minikube tunnel out
 minikube tunnel
 
-# coucou clement
