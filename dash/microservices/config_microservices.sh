@@ -10,15 +10,15 @@ curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stabl
 chmod +x kubectl
 sudo mv kubectl /usr/local/bin
 
-# Install Kind
-[ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
-chmod +x ./kind
-sudo mv ./kind /usr/local/bin/kind
+# # Install Kind
+# [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
+# chmod +x ./kind
+# sudo mv ./kind /usr/local/bin/kind
 
-## Install minikube
-#sudo curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-#chmod +x minikube
-#sudo mv minikube /usr/local/bin
+# Install minikube
+sudo curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+chmod +x minikube
+sudo mv minikube /usr/local/bin
 
 # Install git
 sudo yum install -y git
@@ -38,11 +38,10 @@ git clone https://github.com/kepicorp/microservices-demo-multiarch.git
 cd microservices-demo-multiarch
 
 # Create k8s local cluster
-kind create cluster --config ./dash/microservices/kind-config.yaml
+#kind create cluster --config ./dash/microservices/kind-config.yaml
+minikube start
 
 # Add API KEY and APP KEY to kubectl secrets
-DD_API_KEY=""
-DD_APP_KEY=""
 kubectl create secret generic datadog-secret --from-literal=api-key=$DD_API_KEY --from-literal=app-key=$DD_APP_KEY
 
 # Set hostname
@@ -62,3 +61,6 @@ skaffold run --platform=linux/amd64
 
 # Forward port 8080 to local machine
 kubectl port-forward deployment/frontend 8080:80
+
+# Minikube tunnel out
+minikube tunnel
