@@ -19,3 +19,5 @@ pkg/
 *.tfvars
 release/wi-kubernetes-manifests.yaml
 */*.pem
+*.pem
+minikube-*
