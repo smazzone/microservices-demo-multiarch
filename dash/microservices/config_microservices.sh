@@ -84,7 +84,10 @@ skaffold run --platform=linux/amd64
 
 # Forward port 8080 to local machine
 IP_ADDR=$(ip addr show enX0 | grep "inet " | awk -F'[:{ /}]+' '{ print $3 }')
-kubectl port-forward service --address $IP_ADDR frontend 8080:80 &
+kubectl port-forward --address $IP_ADDR service/frontend 8080:80 &
+
+# add Flag to ENV
+echo "export DD_CTF='TEARSOFSREs'" >> .bashrc
 
 # Minikube tunnel out
 # minikube tunnel
