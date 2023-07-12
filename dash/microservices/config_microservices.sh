@@ -83,7 +83,8 @@ skaffold build --platform=linux/amd64
 skaffold run --platform=linux/amd64
 
 # Forward port 8080 to local machine
-kubectl port-forward service frontend 8080:80
+IP_ADDR=$(ip addr show enX0 | grep "inet " | awk -F'[:{ /}]+' '{ print $3 }')
+kubectl port-forward service --address $IP_ADDR frontend 8080:80 &
 
 # Minikube tunnel out
 # minikube tunnel
