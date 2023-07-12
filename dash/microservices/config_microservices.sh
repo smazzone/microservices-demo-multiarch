@@ -5,7 +5,7 @@ sudo service docker start
 sudo systemctl enable docker
 sudo usermod -a -G docker ec2-user
 
-# Install kubernetes
+# Install Kubectl
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 chmod +x kubectl
 sudo mv kubectl /usr/local/bin
@@ -36,6 +36,22 @@ git clone https://github.com/kepicorp/microservices-demo-multiarch.git
 
 # Getting in the repo
 cd microservices-demo-multiarch
+
+# Install missing components for minikube with --vm-driver=none
+# conntrack
+sudo yum install -y conntrack
+# cri-tools
+VERSION="v1.26.0"
+wget https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-$VERSION-linux-amd64.tar.gz
+sudo tar zxvf crictl-$VERSION-linux-amd64.tar.gz -C /usr/local/bin
+rm -f crictl-$VERSION-linux-amd64.tar.gz
+# cri-dockerd
+VERSION="0.3.4"
+#wget https://github.com/Mirantis/cri-dockerd/releases/download/v${VERSION}/cri-dockerd-${VERSION}.amd64.tgz
+#sudo tar zxvf cri-dockerd-${VERSION}.amd64.tgz -C /usr/local/bin
+#rm -f cri-dockerd-${VERSION}.amd64.tgz
+yum install -y https://github.com/Mirantis/cri-dockerd/releases/download/v${VERSION}/cri-dockerd-${VERSION}-3.el7.x86_64.rpm
+
 
 # Create k8s local cluster
 #kind create cluster --config ./dash/microservices/kind-config.yaml
