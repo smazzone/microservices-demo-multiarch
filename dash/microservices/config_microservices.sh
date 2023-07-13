@@ -10,11 +10,6 @@ curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stabl
 chmod +x kubectl
 sudo mv kubectl /usr/local/bin
 
-# # Install Kind
-# [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
-# chmod +x ./kind
-# sudo mv ./kind /usr/local/bin/kind
-
 # Install minikube
 curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
 chmod +x minikube
@@ -37,32 +32,8 @@ git clone https://github.com/kepicorp/microservices-demo-multiarch.git
 # Getting in the repo
 cd microservices-demo-multiarch
 
-# Install missing components for minikube with --vm-driver=none
-# cri-tools
-# VERSION="v1.26.0"
-# wget https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-$VERSION-linux-amd64.tar.gz
-# sudo tar zxvf crictl-$VERSION-linux-amd64.tar.gz -C /usr/local/bin
-# rm -f crictl-$VERSION-linux-amd64.tar.gz
-# cri-dockerd
-# VERSION="0.3.4"
-# wget https://github.com/Mirantis/cri-dockerd/releases/download/v${VERSION}/cri-dockerd-${VERSION}.amd64.tgz
-# tar xvf cri-dockerd-${VER}-linux-amd64.tar.gz
-# sudo mv cri-dockerd/cri-dockerd /usr/local/bin/
-# rm -f cri-dockerd-${VERSION}.amd64.tgz
-# wget https://raw.githubusercontent.com/Mirantis/cri-dockerd/master/packaging/systemd/cri-docker.service
-# wget https://raw.githubusercontent.com/Mirantis/cri-dockerd/master/packaging/systemd/cri-docker.socket
-# sudo mv cri-docker.socket cri-docker.service /etc/systemd/system/
-# sudo sed -i -e 's,/usr/bin/cri-dockerd,/usr/local/bin/cri-dockerd,' /etc/systemd/system/cri-docker.service
-# yum install -y https://github.com/Mirantis/cri-dockerd/releases/download/v${VERSION}/cri-dockerd-${VERSION}-3.el7.x86_64.rpm
-
-
 # Create k8s local cluster
-#kind create cluster --config ./dash/microservices/kind-config.yaml
 minikube start --cpus=4 --memory 8192 
-# --disk-size 32g
-# sudo -i
-# minikube start --vm-driver=none
-
 
 # Add API KEY and APP KEY to kubectl secrets
 kubectl create secret generic datadog-secret --from-literal=api-key=$DD_API_KEY --from-literal=app-key=$DD_APP_KEY
@@ -87,8 +58,4 @@ IP_ADDR=$(ip addr show enX0 | grep "inet " | awk -F'[:{ /}]+' '{ print $3 }')
 kubectl port-forward --address $IP_ADDR service/frontend 8080:80 &
 
 # add Flag to ENV
-echo "export DD_CTF='TEARSOFSREs'" >> .bashrc
-
-# Minikube tunnel out
-# minikube tunnel
-
+echo "export DD_CTF='LEGENDOFBITS_TEARSOFSRE'" >> .bashrc
