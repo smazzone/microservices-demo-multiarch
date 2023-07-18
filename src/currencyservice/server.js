@@ -48,7 +48,7 @@ if(process.env.ENABLE_TRACING == "1") {
   });
 }
 else {
-  console.log("Tracing disabled.")
+  console.log("Tracing disabled. #FLAG:IAMYOURFATHER")
 }
 
 const path = require('path');
