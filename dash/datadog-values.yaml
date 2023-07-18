@@ -36,7 +36,6 @@ datadog:
   ## Set global tags
   tags:
     - env: dash2023
-    - hostname: minikube
 
   ## Enable Log collections
   logs:
