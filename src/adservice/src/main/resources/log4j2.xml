@@ -25,7 +25,7 @@
            "traceSampled", and "timestamp" in the Stackdriver LogEntry
            (https://cloud.google.com/logging/docs/agent/configuration#special-fields). -->
 
-      <JsonLayout compact="true" eventEol="true">
+      <JsonLayout compact="true" eventEol="true" properties="true">
         <KeyValuePair key="logging.googleapis.com/trace" value="$${ctx:traceId}"/>
         <KeyValuePair key="logging.googleapis.com/spanId" value="$${ctx:spanId}"/>
         <KeyValuePair key="logging.googleapis.com/traceSampled" value="$${ctx:traceSampled}"/>
