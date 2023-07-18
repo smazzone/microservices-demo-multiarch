@@ -67,8 +67,8 @@ const healthProto = _loadProto(HEALTH_PROTO_PATH).grpc.health.v1;
 const logger = pino({
   name: 'currencyservice-server',
   messageKey: 'message',
-  // Add minikube instead of self discovery for hostname
-  hostname: 'minikube',
+  // Remove self hostname generation
+  base: undefined,
   formatters: {
     level (logLevelString, logLevelNum) {
       return { severity: logLevelString }
