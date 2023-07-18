@@ -23,8 +23,9 @@ from pythonjsonlogger import jsonlogger
 class CustomJsonFormatter(jsonlogger.JsonFormatter):
   def add_fields(self, log_record, record, message_dict):
     super(CustomJsonFormatter, self).add_fields(log_record, record, message_dict)
-    if not log_record.get('timestamp'):
-      log_record['timestamp'] = record.created
+    ## Removing timestamps
+    #if not log_record.get('timestamp'):
+    #  log_record['timestamp'] = record.created
     if log_record.get('severity'):
       log_record['severity'] = log_record['severity'].upper()
     else:
@@ -33,6 +34,7 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
 def getJSONLogger(name):
   logger = logging.getLogger(name)
   handler = logging.StreamHandler(sys.stdout)
+  ## Please NO timestamp
   # formatter = CustomJsonFormatter('%(timestamp)s %(severity)s %(name)s %(message)s')
   formatter = CustomJsonFormatter('%(severity)s %(name)s %(message)s')
   handler.setFormatter(formatter)
