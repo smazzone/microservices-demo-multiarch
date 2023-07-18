@@ -31,7 +31,8 @@ TEAM_NAME=""
 ```
 Get status from agent
 ```bash
-datadog-agent-mrp4datadog-agent-mrp4s## Add from Instruqt training
+AGENT_POD=$(kubectl get pods | sed -e '/datadog-agent/!d' | sed -n '/cluster/!p' | awk -F' ' '{print $1}')
+kubectl exec $AGENT_POD -- agent status
 ```
 
 ## Instruqt inspiration 

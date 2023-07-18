@@ -48,7 +48,7 @@ if(process.env.ENABLE_TRACING == "1") {
   });
 }
 else {
-  console.log("Tracing disabled.")
+  console.log("Tracing disabled. #FLAG:IAMYOURFATHER")
 }
 
 const path = require('path');
@@ -67,6 +67,8 @@ const healthProto = _loadProto(HEALTH_PROTO_PATH).grpc.health.v1;
 const logger = pino({
   name: 'currencyservice-server',
   messageKey: 'message',
+  // Remove self hostname generation
+  base: undefined,
   formatters: {
     level (logLevelString, logLevelNum) {
       return { severity: logLevelString }

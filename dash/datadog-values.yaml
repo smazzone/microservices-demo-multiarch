@@ -84,6 +84,7 @@ datadog:
           fieldPath: status.hostIP
   # Enable data to be sent with invalid certs (required for kind cluster)
     tlsVerify: false
+  clusterName: dash2023
 
   ## Set up global environment for agent and pods communication
   env:
@@ -91,6 +92,12 @@ datadog:
       valueFrom:
         fieldRef:
           fieldPath: spec.nodeName
+
+  ## Ignore Auto discovery for minikube
+  ignoreAutoConfig:
+    - etcd
+    - kube_controller_manager
+    - kube_scheduler
 
   ## OTLP ingest related configuration
   # otlp:

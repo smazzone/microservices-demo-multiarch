@@ -44,6 +44,7 @@ sudo hostnamectl set-hostname $TEAM_NAME-dash2023
 
 # Install agent
 helm repo add datadog https://helm.datadoghq.com
+helm repo add stable https://charts.helm.sh/stable 
 helm repo update
 
 # Start agent with datadog-values.yaml
@@ -57,5 +58,10 @@ skaffold run --platform=linux/amd64
 IP_ADDR=$(ip addr show enX0 | grep "inet " | awk -F'[:{ /}]+' '{ print $3 }')
 kubectl port-forward --address $IP_ADDR service/frontend 8080:80 &
 
+# Add POD Agent pod address
+AGENT_POD=$(kubectl get pods | sed -e '/datadog-agent/!d' | sed -n '/cluster/!p' | sed -n '/metrics/!p' | awk -F' ' '{print $1}')
+echo "alias datadog-status='kubectl exec \$AGENT_POD -- agent status'" >> ~.bashrc
+
 # add Flag to ENV
-echo "export DD_CTF='LEGENDOFBITS_TEARSOFSRE'" >> .bashrc
+echo "export DD_CTF='LEGENDOFBITS_TEARSOFSRE'" >> ~.bashrc
+source .bashrc
