@@ -41,7 +41,6 @@ datadog:
   logs:
     enabled: true
     containerCollectAll: true
-    containerCollectUsingFiles: false
 
   ## Collect kubernetes events
   collectEvents: true
