@@ -85,9 +85,6 @@ datadog:
   # Enable data to be sent with invalid certs (required for kind cluster)
     tlsVerify: false
   clusterName: dash2023
-  kubeStateMetricsEnabled: true
-  kubeStateMetricsCore:
-    enabled: false
 
   ## Set up global environment for agent and pods communication
   env:
