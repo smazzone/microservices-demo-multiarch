@@ -35,8 +35,6 @@ spec:
       annotations:
         admission.datadoghq.com/python-lib.version: "v1.6.3"
         ad.datadoghq.com/server.logs: '[{"source": "python"}]'
-  labels:
-    name: redis
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
