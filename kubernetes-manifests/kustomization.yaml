@@ -27,6 +27,7 @@ resources:
  - recommendationservice.yaml
  - redis.yaml
  - shippingservice.yaml
+ - paymentdbservice.yaml
 components:
 # - ../kustomize/components/cymbal-branding
 # - ../kustomize/components/google-cloud-operations

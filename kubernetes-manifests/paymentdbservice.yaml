@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment # what to create?
+metadata:
+  name: paymentdbservice
+spec: # specification for deployment resource
+  replicas: 1 # how many replicas of pods we want to create
+  selector:
+    matchLabels:
+      app: paymentdbservice
+  template: # blueprint for pods
+    metadata:
+      labels:
+        app: paymentdbservice # service will look for this label
+    spec: # specification for pods
+      containers: # we can have one or more containers
+      - name: paymentdbservice
+        image: mariadb
+        ports:
+        - containerPort: 3306 
+        env:
+        #- name: MARIADB_RANDOM_ROOT_PASSWORD
+        - name: MARIADB_ALLOW_EMPTY_ROOT_PASSWORD
+          value: "0" # if it is 1 and root_password is set, root_password takes precedance
+        - name: MARIADB_ROOT_PASSWORD
+          value: topsecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: paymentdbservice
+spec:
+  type: ClusterIP
+  selector:
+    app: paymentdbservice
+  ports:
+  - name: tcp-mariadb
+    port: 3306
+    targetPort: 3306
