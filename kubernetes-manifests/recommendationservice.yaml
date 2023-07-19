@@ -34,7 +34,7 @@ spec:
         admission.datadoghq.com/enabled: "true"
       annotations:
         admission.datadoghq.com/python-lib.version: "v1.6.3"
-        ad.datadoghq.com/python.logs: '[{"source": "python","service": "recommendationservice","tags": ["env:dash2023"]}]'
+        ad.datadoghq.com/server.logs: '[{"source": "python"}]'
   labels:
     name: redis
     spec:
