@@ -58,3 +58,8 @@ spec:
             - name: DD_APPSEC_ENABLED
               value: "true"
 ```
+
+## Copy Datadog Config
+
+Use [CLI](https://github.com/DataDog/datadog-sync-cli)
+
