@@ -2,6 +2,36 @@ apiVersion: apps/v1
 kind: Deployment # what to create?
 metadata:
   name: paymentdbservice
+  annotations:
+    annotations:
+    ad.datadoghq.com/paymentdbservice.check_names: '[mysql"]'
+    ad.datadoghq.com/paymentdbservice.init_configs: "[{}]"
+    ad.datadoghq.com/paymentdbservice.instances: |
+      [
+        {
+          "dbm": true
+          "server": "%%host%%"
+          "port": 3306
+          "username": "datadog"
+          "password": "bitsGoodBoy"
+        }
+      ]      
+    ad.datadoghq.com/paymentdbservice.checks: |
+      {
+        "mysql": {
+          "instances": [
+            {
+              "dbm": true
+              "host": "%%host%%"
+              "port": 3306
+              "username": "datadog"
+              "password": "bitsGoodBoy"
+            ]
+          }
+        }
+      }
+  labels:
+    name: mysql
 spec: # specification for deployment resource
   replicas: 1 # how many replicas of pods we want to create
   selector:
@@ -23,13 +53,75 @@ spec: # specification for deployment resource
           value: "0" # if it is 1 and root_password is set, root_password takes precedance
         - name: MARIADB_ROOT_PASSWORD
           value: topsecret
+        volumeMounts:
+          - name: mysql-initdb
+            mountPath: /docker-entrypoint-initdb.d
+          - mountPath: "/var/lib/mysql"
+            subPath: "mysql"
+            name: mysql-data
+      volumes:
+        - name: mysql-initdb
+          configMap:
+            name: mysql-initdb-config
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: mysql-data-disk    
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-initdb-config
+data:
+  init.sql: |
+      CREATE USER datadog@'%' IDENTIFIED by 'bitsGoodBoy';
+      ALTER USER datadog@'%' WITH MAX_USER_CONNECTIONS 5;
+      GRANT REPLICATION CLIENT ON *.* TO datadog@'%';
+      GRANT PROCESS ON *.* TO datadog@'%';
+      GRANT SELECT ON performance_schema.* TO datadog@'%';
+      CREATE SCHEMA IF NOT EXISTS datadog;
+      GRANT EXECUTE ON datadog.* to datadog@'%';
+      GRANT CREATE TEMPORARY TABLES ON datadog.* TO datadog@'%';
+      DELIMITER $$
+      CREATE PROCEDURE datadog.explain_statement(IN query TEXT)
+      SQL SECURITY DEFINER
+      BEGIN
+      SET @explain := CONCAT('EXPLAIN FORMAT=json ', query);
+      PREPARE stmt FROM @explain;
+      EXECUTE stmt;
+      DEALLOCATE PREPARE stmt;
+      END $$
+      DELIMITER ;
+      DELIMITER $$
+      CREATE PROCEDURE datadog.enable_events_statements_consumers()
+      SQL SECURITY DEFINER
+      BEGIN
+      UPDATE performance_schema.setup_consumers SET enabled='YES' WHERE name LIKE 'events_statements_%';
+      UPDATE performance_schema.setup_consumers SET enabled='YES' WHERE name = 'events_waits_current'
+      END $$
+      DELIMITER ;
+      GRANT EXECUTE ON PROCEDURE datadog.enable_events_statements_consumers TO datadog@'%';
+      CREATE SCHEMA IF NOT EXISTS paymentdb;
+      CREATE USER swagstore@'%' IDENTIFIED BY 'weLoveSwagAtDash2023';
+      GRANT ALL PRIVILEGES on swagstore.* to swagstore@'%';
+      GRANT ALL PRIVILEGES on swagstore.* to swagstore@'localhost';
+      DELIMITER $$
+      CREATE PROCEDURE paymentdb.explain_statement(IN query TEXT)
+      SQL SECURITY DEFINER
+      BEGIN
+      SET @explain := CONCAT('EXPLAIN FORMAT=json ', query);
+      PREPARE stmt FROM @explain;
+      EXECUTE stmt;
+      DEALLOCATE PREPARE stmt;
+      END $$
+      DELIMITER ;
+      GRANT EXECUTE ON PROCEDURE paymentdb.explain_statement TO datadog@'%';
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: paymentdbservice
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: paymentdbservice
   ports:
