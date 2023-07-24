@@ -44,6 +44,8 @@ build:
     context: src/frontend
   - image: adservice
     context: src/adservice
+  - image: paymentdbservice
+    context: src/paymentdbservice
   tagPolicy:
     gitCommit: {}
   local:
