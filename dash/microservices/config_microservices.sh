@@ -32,6 +32,9 @@ git clone https://github.com/kepicorp/microservices-demo-multiarch.git
 # Getting in the repo
 cd microservices-demo-multiarch
 
+# Add DD_RUM_ID to the footer for RUM usage
+FOOTERFILE="$(pwd)/src/frontend/templates/footer.html"
+
 # Create k8s local cluster
 minikube start --cpus=4 --memory 8192 
 
