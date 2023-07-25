@@ -98,7 +98,7 @@ data:
       GRANT EXECUTE ON PROCEDURE datadog.enable_events_statements_consumers TO datadog@'%';
       CREATE SCHEMA IF NOT EXISTS paymentdb;
       CREATE USER swagstore@'%' IDENTIFIED BY 'weLoveSwagAtDash2023';
-      GRANT ALL PRIVILEGES on swagstore.* to swagstore@'%';
+      GRANT ALL PRIVILEGES on swagstore.* to paymentdb@'%';
       DELIMITER $$
       CREATE PROCEDURE paymentdb.explain_statement(IN query TEXT)
       SQL SECURITY DEFINER
