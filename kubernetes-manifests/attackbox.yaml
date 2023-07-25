@@ -32,13 +32,19 @@ spec:
         - containerPort: 8080
         env:
         - name: ATTACK_GOBUSTER
+          value: "1"
         - name: ATTACK_HYDRA
+          value: "1"
         - name: ATTACK_GOBUSTER_INTERVAL
+          value: "60"
         - name: ATTACK_HYDRA_INTERVAL
+          value: "60"
         - name: ATTACK_SSH
         - name: ATTACK_SSH_INTERVAL
         - name: ATTACK_HOST
+          value: "frontend"
         - name: ATTACK_PORT
+          value: "80"
 ---
 apiVersion: v1
 kind: Service
