@@ -33,7 +33,7 @@ spec:
         tags.datadoghq.com/version: "0.5.0"
         admission.datadoghq.com/enabled: "true"
       annotations:
-        admission.datadoghq.com/js-lib.version: "v3.9.1"
+        admission.datadoghq.com/java-lib.version: "v1.3.0"
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
@@ -55,6 +55,14 @@ spec:
         ports:
         - containerPort: 50051
         env:
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:mariadb://paymentdbservice:3306/paymentdb?useUnicode=true&characterEncoding=utf8&useSSL=false"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: swagstore
+        - name: SPRING_DATASOURCE_PASSWORD 
+          value: weLoveSwagAtDash2023
+        - name: SERVER_PORT
+          value: "8080"
         - name: PORT
           value: "50051"
         - name: DISABLE_PROFILER
@@ -81,7 +89,7 @@ spec:
             memory: 64Mi
           limits:
             cpu: 200m
-            memory: 128Mi
+            memory: 512Mi
 ---
 apiVersion: v1
 kind: Service
@@ -94,4 +102,4 @@ spec:
   ports:
   - name: grpc
     port: 50051
-    targetPort: 50051
+    targetPort: 9090
