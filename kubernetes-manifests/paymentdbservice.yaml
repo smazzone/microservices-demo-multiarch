@@ -1,37 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment # what to create?
 metadata:
-  name: paymentdbservice
-  annotations:
-    annotations:
-    ad.datadoghq.com/paymentdbservice.check_names: '[mysql"]'
-    ad.datadoghq.com/paymentdbservice.init_configs: "[{}]"
-    ad.datadoghq.com/paymentdbservice.instances: |
-      [
-        {
-          "dbm": true
-          "server": "%%host%%"
-          "port": 3306
-          "username": "datadog"
-          "password": "bitsGoodBoy"
-        }
-      ]      
-    ad.datadoghq.com/paymentdbservice.checks: |
-      {
-        "mysql": {
-          "instances": [
-            {
-              "dbm": true
-              "host": "%%host%%"
-              "port": 3306
-              "username": "datadog"
-              "password": "bitsGoodBoy"
-            ]
-          }
-        }
-      }
+  name: paymentdbservice  
   labels:
     name: mysql
+    tags.datadoghq.com/env: "dash2023"
+    tags.datadoghq.com/service: "paymentdbservice"
+    tags.datadoghq.com/version: "0.5.0"
 spec: # specification for deployment resource
   replicas: 1 # how many replicas of pods we want to create
   selector:
@@ -41,6 +16,26 @@ spec: # specification for deployment resource
     metadata:
       labels:
         app: paymentdbservice # service will look for this label
+        name: mysql
+        tags.datadoghq.com/env: "dash2023"
+        tags.datadoghq.com/service: "paymentdbservice"
+        tags.datadoghq.com/version: "0.5.0"
+      annotations:
+        ad.datadoghq.com/paymentdbservice.checks: |
+          {
+            "mysql": {
+              "instances": [
+                {
+                  "dbm": true
+                  "host": "%%host%%"
+                  "port": 3306
+                  "username": "datadog"
+                  "password": "bitsGoodBoy"
+                }
+              ]
+            }
+          }
+        ad.datadoghq.com/server.logs: '[{"source": "mysql", "service": "paymentdbservice"}]'
     spec: # specification for pods
       containers: # we can have one or more containers
       - name: paymentdbservice

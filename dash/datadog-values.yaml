@@ -25,7 +25,7 @@ clusterAgent:
   ## Enable replications required for Admission Controller and Metrics Provider
   replicas: 2
   createPodDisruptionBudget: true
- 
+
 datadog:
   ## Set APIkey and APPKey Optionally the site
   apiKeyExistingSecret: datadog-secret
