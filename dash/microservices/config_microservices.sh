@@ -59,7 +59,9 @@ skaffold run --platform=linux/amd64
 
 # Forward port 8080 to local machine
 IP_ADDR=$(ip addr show enX0 | grep "inet " | awk -F'[:{ /}]+' '{ print $3 }')
-kubectl port-forward --address $IP_ADDR service/frontend 8080:80 &
+# kubectl port-forward --address $IP_ADDR service/frontend 8080:80 &
+kubectl patch svc frontend-external -n default -p '{"spec": {"type": "LoadBalancer", "externalIPs":["${IP_ADDR}"]}}'
+kubectl patch svc frontend-external -n default -p '{"spec": {"type": "LoadBalancer", "externalIPs":["34.203.218.20"]}}'
 
 # Add POD Agent pod address
 AGENT_POD=$(kubectl get pods | sed -e '/datadog-agent/!d' | sed -n '/cluster/!p' | sed -n '/metrics/!p' | awk -F' ' '{print $1}')
