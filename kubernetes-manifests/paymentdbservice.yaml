@@ -92,14 +92,13 @@ data:
       SQL SECURITY DEFINER
       BEGIN
       UPDATE performance_schema.setup_consumers SET enabled='YES' WHERE name LIKE 'events_statements_%';
-      UPDATE performance_schema.setup_consumers SET enabled='YES' WHERE name = 'events_waits_current'
+      UPDATE performance_schema.setup_consumers SET enabled='YES' WHERE name = 'events_waits_current';
       END $$
       DELIMITER ;
       GRANT EXECUTE ON PROCEDURE datadog.enable_events_statements_consumers TO datadog@'%';
       CREATE SCHEMA IF NOT EXISTS paymentdb;
       CREATE USER swagstore@'%' IDENTIFIED BY 'weLoveSwagAtDash2023';
       GRANT ALL PRIVILEGES on swagstore.* to swagstore@'%';
-      GRANT ALL PRIVILEGES on swagstore.* to swagstore@'localhost';
       DELIMITER $$
       CREATE PROCEDURE paymentdb.explain_statement(IN query TEXT)
       SQL SECURITY DEFINER
