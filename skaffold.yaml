@@ -77,5 +77,6 @@ build:
 manifests:
   rawYaml:
   - ./kubernetes-manifests/loadgenerator.yaml
+  - ./kubernetes-manifests/attackbox.yaml
 deploy:
   kubectl: {}
