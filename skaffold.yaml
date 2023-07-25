@@ -33,7 +33,7 @@ build:
   - image: checkoutservice
     context: src/checkoutservice
   - image: paymentservice
-    context: src/paymentservice
+    context: src/paymentservicejava
   - image: currencyservice
     context: src/currencyservice
   - image: cartservice
