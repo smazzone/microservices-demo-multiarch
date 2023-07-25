@@ -14,9 +14,10 @@ spec: # specification for deployment resource
       app: paymentdbservice
   template: # blueprint for pods
     metadata:
+      name: paymentdbservice
       labels:
         app: paymentdbservice # service will look for this label
-        name: mysql
+        name: paymentdbservice
         tags.datadoghq.com/env: "dash2023"
         tags.datadoghq.com/service: "paymentdbservice"
         tags.datadoghq.com/version: "0.5.0"
@@ -26,16 +27,16 @@ spec: # specification for deployment resource
             "mysql": {
               "instances": [
                 {
-                  "dbm": true
-                  "host": "%%host%%"
-                  "port": 3306
-                  "username": "datadog"
+                  "dbm": "true",
+                  "host": "%%host%%",
+                  "port": 3306,
+                  "username": "datadog",
                   "password": "bitsGoodBoy"
                 }
               ]
             }
           }
-        ad.datadoghq.com/server.logs: '[{"source": "mysql", "service": "paymentdbservice"}]'
+        ad.datadoghq.com/paymentdbservice.logs: '[{"source": "mysql", "service": "paymentdbservice"}]'
     spec: # specification for pods
       containers: # we can have one or more containers
       - name: paymentdbservice
@@ -48,19 +49,19 @@ spec: # specification for deployment resource
           value: "0" # if it is 1 and root_password is set, root_password takes precedance
         - name: MARIADB_ROOT_PASSWORD
           value: topsecret
-        volumeMounts:
-          - name: mysql-initdb
-            mountPath: /docker-entrypoint-initdb.d
-          - mountPath: "/var/lib/mysql"
-            subPath: "mysql"
-            name: mysql-data
-      volumes:
-        - name: mysql-initdb
-          configMap:
-            name: mysql-initdb-config
-        - name: mysql-data
-          persistentVolumeClaim:
-            claimName: mysql-data-disk    
+ #        volumeMounts:
+          # - name: mysql-initdb
+            # mountPath: /docker-entrypoint-initdb.d
+          # - mountPath: "/var/lib/mysql"
+            # subPath: "mysql"
+            # name: mysql-data
+      # volumes:
+        # - name: mysql-initdb
+          # configMap:
+            # name: mysql-initdb-config
+        # - name: mysql-data
+          # persistentVolumeClaim:
+            # claimName: mysql-data-disk    
 ---
 apiVersion: v1
 kind: ConfigMap
