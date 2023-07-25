@@ -49,19 +49,19 @@ spec: # specification for deployment resource
           value: "0" # if it is 1 and root_password is set, root_password takes precedance
         - name: MARIADB_ROOT_PASSWORD
           value: topsecret
- #        volumeMounts:
-          # - name: mysql-initdb
-            # mountPath: /docker-entrypoint-initdb.d
-          # - mountPath: "/var/lib/mysql"
-            # subPath: "mysql"
-            # name: mysql-data
-      # volumes:
-        # - name: mysql-initdb
-          # configMap:
-            # name: mysql-initdb-config
-        # - name: mysql-data
-          # persistentVolumeClaim:
-            # claimName: mysql-data-disk    
+        volumeMounts:
+          - name: mysql-initdb
+            mountPath: /docker-entrypoint-initdb.d
+          - mountPath: "/var/lib/mysql"
+            subPath: "mysql"
+            name: mysql-data
+      volumes:
+        - name: mysql-initdb
+          configMap:
+            name: mysql-initdb-config
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: mysql-data-disk    
 ---
 apiVersion: v1
 kind: ConfigMap
