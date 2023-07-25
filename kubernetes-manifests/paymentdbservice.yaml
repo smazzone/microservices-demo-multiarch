@@ -28,7 +28,7 @@ spec: # specification for deployment resource
               "instances": [
                 {
                   "dbm": "true",
-                  "host": "%%host%%",
+                  "host": "paymentdbservice",
                   "port": 3306,
                   "username": "datadog",
                   "password": "bitsGoodBoy"
@@ -117,7 +117,7 @@ kind: Service
 metadata:
   name: paymentdbservice
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: paymentdbservice
   ports:
