@@ -35,7 +35,6 @@ cd microservices-demo-multiarch
 # Add DD_RUM_ID to the footer for RUM usage
 FOOTERFILE="$(pwd)/src/frontend/templates/footer.html"
 FOOTERTEMPLATE="$(pwd)/src/frontend/templates/footer-template.html"
-RUM_APP_ID="9b6125af-cbda-4186-8976-a1f5326b613f"
 sed -e "s/\<RUM_APP_ID\>/$RUM_APP_ID/" $FOOTERTEMPLATE > $FOOTERFILE
 
 # Create k8s local cluster

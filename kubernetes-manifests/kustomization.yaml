@@ -21,7 +21,6 @@ resources:
  - currencyservice.yaml
  - emailservice.yaml
  - frontend.yaml
-# - loadgenerator.yaml # During development, the loadgenerator module inside skaffold.yaml will be used.
  - paymentservice.yaml
  - productcatalogservice.yaml
  - recommendationservice.yaml
@@ -29,13 +28,3 @@ resources:
  - shippingservice.yaml
  - paymentdbservice.yaml
 components:
-# - ../kustomize/components/cymbal-branding
-# - ../kustomize/components/google-cloud-operations
-# - ../kustomize/components/memorystore
-# - ../kustomize/components/network-policies
-# - ../kustomize/components/service-accounts
-# - ../kustomize/components/spanner
-# - ../kustomize/components/container-images-tag
-# - ../kustomize/components/container-images-tag-suffix
-# - ../kustomize/components/container-images-registry
-# - ../kustomize/components/native-grpc-health-check
