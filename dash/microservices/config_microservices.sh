@@ -44,8 +44,8 @@ minikube start --cpus=4 --memory 8192
 kubectl create secret generic datadog-secret --from-literal=api-key=$DD_API_KEY --from-literal=app-key=$DD_APP_KEY
 
 # Set hostname
-TEAM_NAME=bits
-sudo hostnamectl set-hostname $TEAM_NAME-dash2023
+# TEAM_NAME=bits
+# sudo hostnamectl set-hostname $TEAM_NAME-dash2023
 
 # Install agent
 helm repo add datadog https://helm.datadoghq.com
