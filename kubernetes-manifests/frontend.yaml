@@ -128,7 +128,7 @@ spec:
 # apiVersion: v1
 # kind: Service
 # metadata:
-#   name: frontend-kind
+#   name: frontend-np
 # spec:
 #   selector:
 #     name: frontend

@@ -16,10 +16,14 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: attackbox
+  labels:
+    tags.datadoghq.com/env: "dash2023"
+    tags.datadoghq.com/service: "attackbox"
+    tags.datadoghq.com/version: "1.0"
 spec:
   selector:
     matchLabels:
-      app: attackbox
+      app: attackbox 
   template:
     metadata:
       labels:
@@ -45,16 +49,3 @@ spec:
           value: "frontend"
         - name: ATTACK_PORT
           value: "80"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: attackbox
-spec:
-  type: ClusterIP
-  selector:
-    app: attackbox
-  ports:
-  - name: attacktcp
-    port: 8080
-    targetPort: 8080
