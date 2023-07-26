@@ -1,5 +1,5 @@
 
-FROM openjdk:18-jdk-alpine
+FROM openjdk:17-jdk-alpine
 
 #RUN mvn clean install -Dmaven.test.skip=true
 
