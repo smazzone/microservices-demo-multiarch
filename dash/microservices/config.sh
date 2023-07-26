@@ -39,9 +39,6 @@ helm repo add datadog https://helm.datadoghq.com
 helm repo add stable https://charts.helm.sh/stable 
 helm repo update
 
-# Skaffold build and run
-skaffold build --platform=linux/amd64
-
 # Forward port 8080 to local machine
 #IP_ADDR=$(ip addr show enX0 | grep "inet " | awk -F'[:{ /}]+' '{ print $3 }')
 #kubectl patch svc frontend-external -n default -p "{\"spec\": {\"type\": \"LoadBalancer\", \"externalIPs\":[\"${IP_ADDR}\"]}}"
