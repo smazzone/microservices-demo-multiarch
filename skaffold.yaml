@@ -51,6 +51,7 @@ build:
   local:
     # useBuildkit: false
     useBuildkit: true
+    push: false
 manifests:
   kustomize:
     paths:
