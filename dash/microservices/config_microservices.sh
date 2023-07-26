@@ -16,7 +16,7 @@ chmod +x minikube
 sudo mv minikube /usr/local/bin
 
 # Install git and conntrack
-sudo yum install -y git conntrack
+sudo yum install -y git conntrack nginx
 
 # Install Skaffold
 sudo curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
@@ -43,9 +43,8 @@ minikube start --cpus=4 --memory 8192
 # Add API KEY and APP KEY to kubectl secrets
 kubectl create secret generic datadog-secret --from-literal=api-key=$DD_API_KEY --from-literal=app-key=$DD_APP_KEY
 
-# Set hostname
-# TEAM_NAME=bits
-# sudo hostnamectl set-hostname $TEAM_NAME-dash2023
+# Enable ingress to minikube
+minikube addons enable ingress
 
 # Install agent
 helm repo add datadog https://helm.datadoghq.com
