@@ -1,21 +1,22 @@
 package com.hipstershop.paymentservicejava;
 
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.logging.Logger;
 
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.protobuf.Any;
+import com.google.rpc.ErrorInfo;
 import com.hipstershop.paymentservicejava.dataaccess.PaymentRecordRepository;
 import com.hipstershop.paymentservicejava.model.PaymentRecord;
 
 import hipstershop.PaymentServiceGrpc;
 import hipstershop.Payment.ChargeRequest;
 import hipstershop.Payment.ChargeResponse;
+import io.grpc.protobuf.StatusProto;
 import net.devh.boot.grpc.server.service.GrpcService;
 
 @GrpcService
@@ -54,27 +55,41 @@ public class PaymentServiceImpl extends PaymentServiceGrpc.PaymentServiceImplBas
             } catch (Exception e) {
                 e.printStackTrace();
             }
-             
-
-            // persist payment data to the database
-            PaymentRecord rec = new PaymentRecord();
-            String amountS = String.valueOf(amount) + "." + String.valueOf(nanos);
-            rec.setAmount(Double.parseDouble(amountS));
-            rec.setCreditcardnumber(ccNumber);
-            rec.setCvvcode(String.valueOf(request.getCreditCard().getCreditCardCvv()));
-            rec.setExpirationMonth(request.getCreditCard().getCreditCardExpirationMonth());
-            rec.setExpirationYear(request.getCreditCard().getCreditCardExpirationYear());
-            rec.setPaymentstatus("transaction completed");
             
-            repo.save(rec);
+            Random r = new Random(123123);
+            if(r.nextInt(10) > 6) { // we want about 40 percent of our requests to fail
+                this.log.warning("LockTimeOutException occurred. Cannot write to database.");
+                com.google.rpc.Status status = com.google.rpc.Status.newBuilder()
+                .setCode(com.google.rpc.Code.NOT_FOUND.getNumber())
+                .setMessage("DatabaseLockException")
+                .addDetails(Any.pack(ErrorInfo.newBuilder()
+                    .setReason("Database table appears to be locked")
+                    .setDomain("hipstershop.paymentserviceimpl")
+                    .build()))
+                .build();
+                responseObserver.onError(StatusProto.toStatusRuntimeException(status));
+            } else {
 
-            // build the response
-            ChargeResponse reply = ChargeResponse.newBuilder().
-                setTransactionId("asdfasdfsafd").
-                build();
+                // persist payment data to the database
+                PaymentRecord rec = new PaymentRecord();
+                String amountS = String.valueOf(amount) + "." + String.valueOf(nanos);
+                rec.setAmount(Double.parseDouble(amountS));
+                rec.setCreditcardnumber(ccNumber);
+                rec.setCvvcode(String.valueOf(request.getCreditCard().getCreditCardCvv()));
+                rec.setExpirationMonth(request.getCreditCard().getCreditCardExpirationMonth());
+                rec.setExpirationYear(request.getCreditCard().getCreditCardExpirationYear());
+                rec.setPaymentstatus("transaction completed");
+                
+                repo.save(rec);
 
-            responseObserver.onNext(reply);
-            responseObserver.onCompleted();
+                // build the response
+                ChargeResponse reply = ChargeResponse.newBuilder().
+                    setTransactionId("asdfasdfsafd").
+                    build();
+
+                responseObserver.onNext(reply);
+                responseObserver.onCompleted();
+            }
     }    
 
     private String getCardtypeByNumber(String creditcardNumber) {
