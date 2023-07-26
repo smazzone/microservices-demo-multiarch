@@ -35,7 +35,7 @@ cd microservices-demo-multiarch
 # Add DD_RUM_ID to the footer for RUM usage
 FOOTERFILE="$(pwd)/src/frontend/templates/footer.html"
 FOOTERTEMPLATE="$(pwd)/src/frontend/templates/footer-template.html"
-sed -e "s/\<RUM_APP_ID\>/$RUM_APP_ID/" $FOOTERTEMPLATE > $FOOTERFILE
+sed -e "s/\<RUM_APP_ID\>/$RUM_APP_ID/" $FOOTERTEMPLATE | sed -e "s/\<RUM_CLIENT_TOKEN\>/$RUM_CLIENT_TOKEN/" > $FOOTERFILE
 
 # Create k8s local cluster
 minikube start --cpus=4 --memory 8192 
