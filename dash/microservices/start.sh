@@ -12,7 +12,7 @@ helm install datadog-agent -f dash/datadog-values.yaml datadog/datadog --set dat
 echo "> (Building) Running micro-services"
 # Skaffold build and run
 skaffold build --platform=linux/amd64
-skaffold run --platform=linux/arm64
+skaffold run --platform=linux/amd64
 
 echo "> Configuring extras"
 # Setting variable to check agent status
