@@ -19,5 +19,5 @@ echo "> Configuring extras"
 AGENT_POD=$(kubectl get pods | sed -e '/datadog-agent/!d' | sed -n '/cluster/!p' | sed -n '/metrics/!p' | awk -F' ' '{print $1}')
 # Configure nginx
 FRONTEND_LB=$(minikube service frontend-lb --url)
-sudo sed -e "/\<FRONTEND_LB\>/$FRONTEND_LB/" ./dash/nginx.conf > /etc/nginx/nginx.conf
+sudo sed -e "/\<FRONTEND_LB\>/${FRONTEND_LB}/" ./dash/nginx.conf > /etc/nginx/nginx.conf
 sudo systemctl restart nginx
