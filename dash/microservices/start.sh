@@ -18,6 +18,6 @@ echo "> Configuring extras"
 # Setting variable to check agent status
 AGENT_POD=$(kubectl get pods | sed -e '/datadog-agent/!d' | sed -n '/cluster/!p' | sed -n '/metrics/!p' | awk -F' ' '{print $1}')
 # Configure nginx
-FRONTEND_LB=$(minikube service frontend-lb)
+FRONTEND_LB=$(minikube service frontend-lb --url)
 sudo sed -e "s/\<FRONTEND_LB\>/$FRONTEND_LB/" ./dash/nginx.conf > /etc/nginx/nginx.conf
 sudo systemctl restart nginx
