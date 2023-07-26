@@ -9,7 +9,9 @@ kubectl create secret generic datadog-secret --from-literal=api-key=$DD_API_KEY 
 echo "> Setting up of datadog-agent"
 helm install datadog-agent -f dash/datadog-values.yaml datadog/datadog --set datadog.apiKey=$DD_API_KEY
 ## Restart kubernetes Deployment and Services
-echo "> Running micro-services"
+echo "> (Building) Running micro-services"
+# Skaffold build and run
+skaffold build --platform=linux/amd64
 skaffold run --platform=linux/arm64
 
 echo "> Configuring extras"
