@@ -46,10 +46,6 @@ skaffold build --platform=linux/amd64
 #IP_ADDR=$(ip addr show enX0 | grep "inet " | awk -F'[:{ /}]+' '{ print $3 }')
 #kubectl patch svc frontend-external -n default -p "{\"spec\": {\"type\": \"LoadBalancer\", \"externalIPs\":[\"${IP_ADDR}\"]}}"
 
-# Configure nginx
-FRONTEND_LB=$(minikube service frontend-lb)
-sudo sed -e "s/\<FRONTEND_LB\>/$FRONTEND_LB/" ./dash/nginx.conf > /etc/nginx/nginx.conf
-
 # Allowing scripts to be executed and starting service
 chmod u+x *.sh
 
