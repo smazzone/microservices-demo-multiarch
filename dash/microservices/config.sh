@@ -48,7 +48,7 @@ chmod u+x *.sh
 
 # Add POD Agent pod address
 cd
-echo "alias datadog-status='kubectl exec \$AGENT_POD -- agent status'" >> ~.bashrc
+echo "alias datadog-status='kubectl exec \$AGENT_POD -- agent status'" >> .bashrc
 
 # add Flag to ENV
 echo "export DD_CTF='LEGENDOFBITS_TEARSOFSRE'" >> .bashrc
