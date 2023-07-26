@@ -1,11 +1,8 @@
 #!/bin/bash
-sudo yum update -y
-sudo yum install docker -y
-sudo service docker start 
-sudo systemctl enable docker
-sudo usermod -a -G docker ec2-user
 
-# Install Kubectl
+## Run as ec2-user when EC2 instance as been booted up and pre-config
+
+# Install kubectl
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 chmod +x kubectl
 sudo mv kubectl /usr/local/bin
@@ -15,7 +12,7 @@ curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/miniku
 chmod +x minikube
 sudo mv minikube /usr/local/bin
 
-# Install git and conntrack
+# Install git and conntrack and nginx (for reverse proxy)
 sudo yum install -y git conntrack nginx
 
 # Install Skaffold
@@ -37,35 +34,29 @@ FOOTERFILE="$(pwd)/src/frontend/templates/footer.html"
 FOOTERTEMPLATE="$(pwd)/src/frontend/templates/footer-template.html"
 sed -e "s/\<RUM_APP_ID\>/$RUM_APP_ID/" $FOOTERTEMPLATE > $FOOTERFILE
 
-# Create k8s local cluster
-minikube start --cpus=4 --memory 8192 
-
-# Add API KEY and APP KEY to kubectl secrets
-kubectl create secret generic datadog-secret --from-literal=api-key=$DD_API_KEY --from-literal=app-key=$DD_APP_KEY
-
-# Enable ingress to minikube
-minikube addons enable ingress
-
 # Install agent
 helm repo add datadog https://helm.datadoghq.com
 helm repo add stable https://charts.helm.sh/stable 
 helm repo update
 
-# Start agent with datadog-values.yaml
-helm install datadog-agent -f dash/datadog-values.yaml datadog/datadog --set datadog.apiKey=$DD_API_KEY
-
 # Skaffold build and run
 skaffold build --platform=linux/amd64
-skaffold run --platform=linux/amd64
 
 # Forward port 8080 to local machine
-IP_ADDR=$(ip addr show enX0 | grep "inet " | awk -F'[:{ /}]+' '{ print $3 }')
-kubectl patch svc frontend-external -n default -p "{\"spec\": {\"type\": \"LoadBalancer\", \"externalIPs\":[\"${IP_ADDR}\"]}}"
+#IP_ADDR=$(ip addr show enX0 | grep "inet " | awk -F'[:{ /}]+' '{ print $3 }')
+#kubectl patch svc frontend-external -n default -p "{\"spec\": {\"type\": \"LoadBalancer\", \"externalIPs\":[\"${IP_ADDR}\"]}}"
+
+# Configure nginx
+FRONTEND_LB=$(minikube service frontend-lb)
+sudo sed -e "s/\<FRONTEND_LB\>/$FRONTEND_LB/" ./dash/nginx.conf > /etc/nginx/nginx.conf
+
+# Allowing scripts to be executed and starting service
+chmod u+x *.sh
 
 # Add POD Agent pod address
-AGENT_POD=$(kubectl get pods | sed -e '/datadog-agent/!d' | sed -n '/cluster/!p' | sed -n '/metrics/!p' | awk -F' ' '{print $1}')
+cd
 echo "alias datadog-status='kubectl exec \$AGENT_POD -- agent status'" >> ~.bashrc
 
 # add Flag to ENV
-echo "export DD_CTF='LEGENDOFBITS_TEARSOFSRE'" >> ~.bashrc
+echo "export DD_CTF='LEGENDOFBITS_TEARSOFSRE'" >> .bashrc
 source .bashrc
