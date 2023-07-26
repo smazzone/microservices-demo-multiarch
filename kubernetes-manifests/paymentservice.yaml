@@ -61,6 +61,8 @@ spec:
           value: swagstore
         - name: SPRING_DATASOURCE_PASSWORD 
           value: weLoveSwagAtDash2023
+        - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+          value: create
         - name: SERVER_PORT
           value: "8080"
         - name: PORT
