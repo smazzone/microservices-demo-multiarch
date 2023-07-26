@@ -219,12 +219,10 @@ microservices](./dash/static/arch.png)](./dash/static/arch.png)
 
 ## How to ?
 
-You will find scripts to:
-* Start the services `./start.sh`
-* Stop the services `./stop.sh`
-* Reload all the configuration `./update.sh`
+The datadog cluster agent configuration is in `dash/datadog-values.yaml`.
+All configuration `yaml` file for each services are in `kubernetes-manifests` directory.
 
-The datadog cluster agent configuration is in `dash/datadog-values.yaml`
+The only script you should need is `update.sh` to reload all configurations.
 
 ## Useful command
 
@@ -242,6 +240,12 @@ Check the status of *datadog-agent*
 ```bash
 datadog-status
 ```
+
+If the control plane goes down you can restart it with
+```bash
+minikube start
+```
+
 
 Which is an alias for `kubectl exec $AGENT_POD -- agent status`
 

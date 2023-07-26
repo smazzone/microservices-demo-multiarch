@@ -33,7 +33,8 @@ build:
   - image: checkoutservice
     context: src/checkoutservice
   - image: paymentservice
-    context: src/paymentservicejava
+    #context: src/paymentservicejava
+    context: src/paymentservice
   - image: currencyservice
     context: src/currencyservice
   - image: cartservice
@@ -78,6 +79,6 @@ build:
 manifests:
   rawYaml:
   - ./kubernetes-manifests/loadgenerator.yaml
-  - ./kubernetes-manifests/attackbox.yaml
+  - ./dash/microservices/attackbox.yaml
 deploy:
   kubectl: {}
