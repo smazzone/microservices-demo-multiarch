@@ -20,4 +20,3 @@ AGENT_POD=$(kubectl get pods | sed -e '/datadog-agent/!d' | sed -n '/cluster/!p'
 # Configure nginx
 export FRONTEND_LB=$(minikube service frontend-lb --url)
 sudo -E ./dash/microservices/conf_nginx.sh
-sudo systemctl restart nginx
