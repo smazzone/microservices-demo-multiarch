@@ -10,6 +10,15 @@ echo "> Setting up of datadog-agent"
 helm install datadog-agent -f dash/datadog-values.yaml datadog/datadog --set datadog.apiKey=$DD_API_KEY
 ## Restart kubernetes Deployment and Services
 echo "> (Building) Running micro-services"
+
+# Set context to docker
+eval $(minikube -p minikube docker-env)
+# Pull all missing images
+docker pull redis:alpine
+docker pull mariadb
+docker pull busybox:latest
+docker pull ddtraining/attackbox:2.1.3
+
 # Skaffold build and run
 skaffold build --platform=linux/amd64
 skaffold run --platform=linux/amd64
