@@ -20,12 +20,14 @@ docker pull busybox:latest
 docker pull ddtraining/attackbox:2.1.3
 
 # Skaffold build and run
+## Loop until return code success
 skaffold build --platform=linux/amd64
+until [ $? -eq 0 ]; do skaffold build --platform=linux/amd64; done
 skaffold run --platform=linux/amd64
 
 echo "> Configuring extras"
 # Setting variable to check agent status
-AGENT_POD=$(kubectl get pods | sed -e '/datadog-agent/!d' | sed -n '/cluster/!p' | sed -n '/metrics/!p' | awk -F' ' '{print $1}')
+export AGENT_POD=$(kubectl get pods | sed -e '/datadog-agent/!d' | sed -n '/cluster/!p' | sed -n '/metrics/!p' | awk -F' ' '{print $1}')
 # Configure nginx
 export FRONTEND_LB=$(minikube service frontend-lb --url)
 sudo -E ./dash/microservices/conf_nginx.sh

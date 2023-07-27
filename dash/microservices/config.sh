@@ -32,7 +32,7 @@ cd microservices-demo-multiarch
 # Add DD_RUM_ID to the footer for RUM usage
 FOOTERFILE="./src/frontend/templates/footer.html"
 FOOTERTEMPLATE="./src/frontend/templates/footer-template.html"
-sed -e "s/\<RUM_APP_ID\>/$RUM_APP_ID/" $FOOTERTEMPLATE | sed -e "s/\<RUM_CLIENT_TOKEN\>/$RUM_CLIENT_TOKEN/" > $FOOTERFILE
+sed -e "s/RUM_APP_ID/$RUM_APP_ID/" $FOOTERTEMPLATE | sed -e "s/RUM_CLIENT_TOKEN/$RUM_CLIENT_TOKEN/" > $FOOTERFILE
 
 # Install agent
 helm repo add datadog https://helm.datadoghq.com
@@ -43,11 +43,9 @@ helm repo update
 #IP_ADDR=$(ip addr show enX0 | grep "inet " | awk -F'[:{ /}]+' '{ print $3 }')
 #kubectl patch svc frontend-external -n default -p "{\"spec\": {\"type\": \"LoadBalancer\", \"externalIPs\":[\"${IP_ADDR}\"]}}"
 
-# Allowing scripts to be executed and starting service
-chmod u+x *.sh
-
 # Add POD Agent pod address
 cd
+## FOR TERRAFORM ADD extra \\ to AGENT_POD var
 echo "alias datadog-status='kubectl exec \$AGENT_POD -- agent status'" >> .bashrc
 
 # add Flag to ENV

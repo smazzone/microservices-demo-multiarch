@@ -1,0 +1,60 @@
+Welcome to the Dash Partner Summit Tech Challenge
+
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMWk'...oXMMMMMMMMMMMMMM
+MMMWN0xoxKWMMMMMMWNXNWWMMMWXd.  '..;kWMMMMMMMMMMMM
+MNOc..   'o0NWNKkl'',;:clc:'    :c. .lXMMMMMMMMMMM
+Kl.      ...';'.              ..,xl.  lNMMMMMMMMMM
+;        ',                    .:ONO:.'OMMMMMMMMMM
+.        .c,                    .cKWWK0NMMMMMMMMMM
+:         co.                  .ccl0MMMMMMMMMMMMMM
+Nd.      .xO'     ,ldo'        ,KWkxNMMMMMMMMMMMMM
+MWKd;..':kXx.    cNMMWx.        'c:cKMMMMMMMMMMMMM
+MMMMXdcodo;.     ;kOxo,             :KWMMMMMMMMMMM
+MMMMX;                               'kWMMMMMMMMMM
+MMMMWo                         ':lodc..OMMMMMMMMMM
+MMMMM0'                       .dNMMNd. oWMMMMMMMMM
+MMMMMNd'                        'cl;. .xMMMMMMMMMM
+MMMMMMWXd,       .',.            ,'  .lXMWNXK0kxON
+MMMMMMMMWXl        .:ll;'... .'cxOd:::cc:,'..   'O
+MMMMMMMMMM0,      ,lcokkkkkkOOOd;.            ...k
+MMMMMMMMMMK,      lO;.  ...'''.              .xo.d
+MMMMMMMMMXc       ;k;                .'.    .xWk.l
+MMMMMMMXx'        .kc               .xNKd;..xWM0':
+MMMMWKo'  ...     .dd.             ,OWMMMWKKWMMK;,
+MMWKl.    ..,::.   lx.      ':,...:KMMMMMMMMMMMNc.
+MWk'         .:xc. ;k,    .lXWWXK0NMMMMMMMMMMMMWo.
+MX:            ,Oo..xc  .:xNMMMMMMMMMMMMMMMWNXKOc.
+MNo.            c0kkXd.'OWWMMMMMWNXK0kxollc::::ccl
+MMNO:.          .OMMMk.:OOkxdolccc::cclodxO0KXNWMM
+MMMMWk.         'OMMMKc;ccllodxO0KXNWMMMMMMMMMMMMM
+MMMMMWO,       .dNMMMWWNWWMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMWKl.   .,kWMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+
+As a reminder, here's the most important information: 
+1. You have to solve a number of challenges. These challenges are waiting for you at https://ctf.dashpartnersummit.com 
+2. This machine is running a local minikube kubernetes cluster hosting an application. There's no need to change the cluster for any challenges.
+3. To see the application, check out /home/ec2-user/microservices-demo, it contains all the files used for the deployment. 
+4. You can restart the deployment using: /home/ec2-user/microservices-demo/update.sh (Please note that the stack is already running)
+5. The machine and application is monitored using Datadog. For your Datadog credentials, see below. 
+
+Important Credentials
+=====================
+CTF (Capture the Flag) access: 
+https://ctf.dashpartnersummit.com
+username: ctf.login
+password: ctf.password
+
+Datadog access: 
+https://app.datadoghq.com 
+username: dd.login
+password: dd.password
+
+Should you need API access to datadog, you can use these credentials: 
+https://api.datadoghq.com
+DD_API_KEY=dd.apikey
+DD_APP_KEY=dd.appkey
+These are also already set as environment variables for you. 
+
+If you ever need to see this message again, just enter "creds".
+
+Should you have any issues, please raise your hand. One of our TAs will then come to you to help you out. 
