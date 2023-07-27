@@ -29,6 +29,9 @@ git clone https://github.com/kepicorp/microservices-demo-multiarch.git
 # Getting in the repo
 cd microservices-demo-multiarch
 
+# Add docker login
+cp -rf ./dash/microservices/.docker ~/
+
 # Add DD_RUM_ID to the footer for RUM usage
 sed -e "s/RUM_APP_ID/$RUM_APP_ID/" ./src/frontend/templates/footer-template.html | sed -e "s/RUM_CLIENT_TOKEN/$RUM_CLIENT_TOKEN/" > ./src/frontend/templates/footer.html
 
