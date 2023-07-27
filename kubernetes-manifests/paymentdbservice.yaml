@@ -52,16 +52,38 @@ spec: # specification for deployment resource
         volumeMounts:
           - name: mysql-initdb
             mountPath: /docker-entrypoint-initdb.d
-          #- mountPath: "/var/lib/mysql"
-          #  subPath: "mysql"
-          #  name: mysql-data
+          - name: mariadb-config
+            mountPath: /etc/mysql/conf.d/ # directory will be cleaned at the beginning
       volumes:
         - name: mysql-initdb
           configMap:
             name: mysql-initdb-config
-        #- name: mysql-data
-        #  persistentVolumeClaim:
-        #    claimName: mysql-data-disk    
+        - name: mariadb-config
+          configMap:
+            name: mariadb-configmap
+            defaultMode: 0644
+            items:
+            - key: mariadb.cnf
+              path: plugin-configuration.cnf
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-configmap
+data:
+  mariadb.cnf: |
+    [mariadb]
+    performance_schema=ON
+    max_digest_length=4096
+    performance_schema_max_digest_length=4096
+    performance-schema-instrument='stage/%=ON'
+    performance-schema-consumer-events-stages-current=ON
+    performance-schema-consumer-events-stages-history=ON
+    performance-schema-consumer-events-stages-history-long=ON
+    performance-schema-consumer-events-statements-current=ON
+    performance-schema-consumer-events-waits-current=ON
+    performance-schema-consumer-events-statements-history-long=ON
+    performance-schema-consumer-events-statements-history=ON
 ---
 apiVersion: v1
 kind: ConfigMap
