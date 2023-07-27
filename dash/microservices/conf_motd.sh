@@ -1,2 +1,2 @@
 #!\bin\bash
-cp ./dash/microservices/motd /etc/motd
+cp ./dash/microservices/motd > /etc/motd
