@@ -21,8 +21,8 @@ docker pull ddtraining/attackbox:2.1.3
 
 # Skaffold build and run
 ## Loop until 18 pods are up 
-until [[ $(kubectl get pods | awk 'END{print NR}') -gt 17 ]]; do skaffold build --platform=linux/amd64; done
-skaffold run --platform=linux/amd64
+skaffold build --platform=linux/amd64
+until [[ $(kubectl get pods | awk 'END{print NR}') -gt 17 ]]; do skaffold run --platform=linux/amd64; done
 
 echo "> Configuring extras"
 # Setting variable to check agent status
