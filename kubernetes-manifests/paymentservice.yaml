@@ -105,3 +105,16 @@ spec:
   - name: grpc
     port: 50051
     targetPort: 9090
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: paymentservice-lb
+spec:
+  type: LoadBalancer
+  selector:
+    app: paymentservice
+  ports:
+  - name: http
+    port: 50051
+    targetPort: 50051
