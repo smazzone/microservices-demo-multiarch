@@ -49,8 +49,6 @@ sudo ./dash/microservices/conf_motd.sh
 
 # Add POD Agent pod address
 cd
-## FOR TERRAFORM ADD extra \\ to AGENT_POD var
-echo "alias datadog-status='kubectl exec \$AGENT_POD -- agent status'" >> .bashrc
 
 # add Flag to ENV
 echo "export DD_CTF='LEGENDOFBITS_TEARSOFSRE'" >> .bashrc

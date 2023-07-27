@@ -237,8 +237,9 @@ kubectl get svc
 ```
 
 Check the status of *datadog-agent*
+(Technically you can run any agent command from there including *agent configcheck* for example)
 ```bash
-datadog-status
+kubectl exec $AGENT_POD -- agent status
 ```
 
 If the control plane goes down you can restart it with
@@ -246,8 +247,6 @@ If the control plane goes down you can restart it with
 minikube start
 ```
 
-
-Which is an alias for `kubectl exec $AGENT_POD -- agent status`
 
 ## Misc
 
