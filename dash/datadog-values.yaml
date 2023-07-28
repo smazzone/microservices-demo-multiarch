@@ -66,7 +66,7 @@ datadog:
     portEnabled: true
 
   ## Enable APM  Remote configuration
-  remote_configuration:
+  remoteConfiguration:
     enabled: true
 
   ## Enable Cloud Security Posture Management and Cloud Workload Security
