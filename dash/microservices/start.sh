@@ -17,7 +17,6 @@ eval $(minikube -p minikube docker-env)
 docker pull redis:alpine
 docker pull mariadb
 docker pull busybox:latest
-docker pull ddtraining/attackbox:2.1.3
 
 # Skaffold build and run
 ## Loop until 18 pods are up 
