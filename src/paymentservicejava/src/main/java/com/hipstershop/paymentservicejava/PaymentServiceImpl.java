@@ -29,7 +29,7 @@ public class PaymentServiceImpl extends PaymentServiceGrpc.PaymentServiceImplBas
 
     @Override
     public void charge(ChargeRequest request,
-        io.grpc.stub.StreamObserver<ChargeResponse> responseObserver){
+        io.grpc.stub.StreamObserver<ChargeResponse> responseObserver) {
             log.info("Charge request received. Storing credit card details for latent charging and chargebacks.");
                     
             String currency = request.getAmount().getCurrencyCode();
@@ -37,30 +37,30 @@ public class PaymentServiceImpl extends PaymentServiceGrpc.PaymentServiceImplBas
             int nanos = request.getAmount().getNanos();
             String ccNumber = request.getCreditCard().getCreditCardNumber();
         
-            log.info(String.format("Transaction processed: %s ending %s Amount: %s%d.%d", 
-            this.getCardtypeByNumber(ccNumber), 
-            ccNumber.substring(ccNumber.length()-5, ccNumber.length()-1), 
-            currency,
-            amount,
-            nanos));
             
             // perform payment "API call"
             try {
                 URL u = new URL("https://developer.paypal.com/");
                 InputStream in = u.openStream();
                 String response = new String(in.readAllBytes(), StandardCharsets.UTF_8); 
-                for(double i=0; i<5000; i++) {
-                    Math.sqrt(i);
-                }           
+                log.info(String.format("Transaction processed: %s ending %s Amount: %s%d.%d", 
+                this.getCardtypeByNumber(ccNumber), 
+                ccNumber.substring(ccNumber.length()-5, ccNumber.length()-1), 
+                currency,
+                amount,
+                nanos));
             } catch (Exception e) {
                 e.printStackTrace();
             }
             
-            Random r = new Random(123123);
-            if(r.nextInt(10) > 6) { // we want about 40 percent of our requests to fail
+            Random r = new Random(System.currentTimeMillis());
+            if(r.nextBoolean()) {
+                for(double i=0; i<500000; i++) { // let's waste some time to make it look like we're waiting for a table lock
+                    Math.sqrt(i);
+                }           
                 this.log.warning("LockTimeOutException occurred. Cannot write to database.");
                 com.google.rpc.Status status = com.google.rpc.Status.newBuilder()
-                .setCode(com.google.rpc.Code.NOT_FOUND.getNumber())
+                .setCode(com.google.rpc.Code.UNAVAILABLE_VALUE)
                 .setMessage("DatabaseLockException")
                 .addDetails(Any.pack(ErrorInfo.newBuilder()
                     .setReason("Database table appears to be locked")
@@ -68,7 +68,7 @@ public class PaymentServiceImpl extends PaymentServiceGrpc.PaymentServiceImplBas
                     .build()))
                 .build();
                 responseObserver.onError(StatusProto.toStatusRuntimeException(status));
-            } else {
+             } else {
 
                 // persist payment data to the database
                 PaymentRecord rec = new PaymentRecord();
@@ -90,6 +90,7 @@ public class PaymentServiceImpl extends PaymentServiceGrpc.PaymentServiceImplBas
                 responseObserver.onNext(reply);
                 responseObserver.onCompleted();
             }
+            
     }    
 
     private String getCardtypeByNumber(String creditcardNumber) {
