@@ -1,5 +1,6 @@
 
-FROM openjdk:17-jdk-alpine
+#FROM openjdk:17-jdk-alpine
+FROM eclipse-temurin:19.0.1_10-jdk-jammy
 
 #RUN mvn clean install -Dmaven.test.skip=true
 
