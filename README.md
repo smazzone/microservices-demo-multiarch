@@ -247,6 +247,13 @@ If the control plane goes down you can restart it with
 minikube start
 ```
 
+## Points scoring
+
+> Points
+> * Great Plateu - 15 points
+> * Main Quests  - 80 points
+> * Side Quests  - 140 points
+> * Total        - 235 points
 
 ## Misc
 
