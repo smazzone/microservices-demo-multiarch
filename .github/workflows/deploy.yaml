@@ -28,13 +28,20 @@ jobs:
 
       - name: Create Kubeconfig
         run: aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name workshop-cluster --role-arn ${{ secrets.ASSUME_ROLE }} --kubeconfig ./kubeconfig
-        
-      - name: Deploy Helm Chart
-        uses: deliverybot/helm@v1
+      
+      - name: Set up Helm
+        uses: Azure/setup-helm@v1
         with:
-          release: "swagstore"
-          namespace: "swagstore"
-          chart: ./helm-chart
-          value-files: "[./helm-chart/values.yaml]"
-        env:
-          KUBECONFIG_FILE: ./kubeconfig 
+          version: '3.x'
+
+      - name: Helm deploy
+        run: helm install --upgrade -f ./helm-chart/values.yaml swagstore ./helm-chart
+      # - name: Deploy Helm Chart
+      #   uses: deliverybot/helm@v1
+      #   with:
+      #     release: "swagstore"
+      #     namespace: "swagstore"
+      #     chart: ./helm-chart
+      #     value-files: "[./helm-chart/values.yaml]"
+      #   env:
+      #     KUBECONFIG_FILE: ./kubeconfig 
