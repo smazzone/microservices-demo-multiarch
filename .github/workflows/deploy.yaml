@@ -38,10 +38,10 @@ jobs:
       - name: setup Kubectl
         uses: azure/setup-kubectl@v3
       
-      - name: get pods
-        run: kubectl get pods -A
-        env:
-          KUBECONFIG: ${{ secrets.KUBE_CONFIG }}
+      # - name: get pods
+      #   run: kubectl get pods -A
+      #   env:
+      #     KUBECONFIG: ${{ secrets.KUBE_CONFIG }}
 
       - name: Helm deploy
         run: helm upgrade --install -f ./helm-chart/values.yaml swagstore ./helm-chart
