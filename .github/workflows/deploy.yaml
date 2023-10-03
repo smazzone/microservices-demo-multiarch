@@ -6,6 +6,7 @@ on:
 env:
   REPO_NAME: "${{ github.event.repository.name }}"
   AWS_REGION: "us-east-1"
+  KUBECONFIG: "./kubeconfig"
 
 permissions:
   id-token: write
@@ -25,19 +26,19 @@ jobs:
           aws-region: "${{ env.AWS_REGION }}"
           role-to-assume: "${{ secrets.ASSUME_ROLE }}"
           role-session-name: "${{ env.REPO_NAME }}"
-
-      - name: Create Kubeconfig
-        run: aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name workshop-cluster --role-arn ${{ secrets.ASSUME_ROLE }} --kubeconfig ./kubeconfig
-      
+    
       - name: Set up Helm
         uses: Azure/setup-helm@v1
         with:
           version: '3.12.3'
 
+      - name: Create Kubeconfig
+        run: aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name workshop-cluster --role-arn ${{ secrets.ASSUME_ROLE }} --kubeconfig ${{ env.KUBECONFIG }}
+
       - name: Helm deploy
         run: helm upgrade --install -f ./helm-chart/values.yaml swagstore ./helm-chart
         env:
-          KUBE_CONFIG: ./kubeconfig
+          KUBECONFIG: ${{ env.KUBECONFIG }}
       # - name: Deploy Helm Chart
       #   uses: deliverybot/helm@v1
       #   with:
