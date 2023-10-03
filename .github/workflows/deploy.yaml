@@ -32,8 +32,8 @@ jobs:
         with:
           version: '3.12.3'
 
-      - name: Create Kubeconfig
-        run: aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name workshop-cluster --role-arn ${{ secrets.ASSUME_ROLE }} --kubeconfig ${{ env.KUBECONFIG }}
+      # - name: Create Kubeconfig
+      #   run: aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name workshop-cluster --role-arn ${{ secrets.ASSUME_ROLE }} --kubeconfig ${{ env.KUBECONFIG }}
 
       - name: setup Kubectl
         uses: azure/setup-kubectl@v3
@@ -44,4 +44,4 @@ jobs:
       - name: Helm deploy
         run: helm upgrade --install -f ./helm-chart/values.yaml swagstore ./helm-chart
         env:
-          KUBECONFIG: ${{ env.KUBECONFIG }}
+          KUBECONFIG: ${{ secrets.KUBE_CONFIG }}
