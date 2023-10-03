@@ -1,0 +1,43 @@
+name: Deploy Swagstore Demo
+on: 
+  push:
+    branches: [main]
+
+env:
+  REPO_NAME: "${{ github.event.repository.name }}"
+  AWS_REGION: "us-east-1"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: "${{ github.event.pull_request.head.ref }}"
+
+      - name: Setup AWS
+        uses: aws-actions/configure-aws-credentials@v4.0.0
+        with:
+          aws-region: "${{ env.AWS_REGION }}"
+          role-to-assume: "${{ secrets.ASSUME_ROLE }}"
+          role-session-name: "${{ env.REPO_NAME }}"
+
+      - name: Create Kubeconfig
+        run: aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name workshop-cluster --role-arn ${{ secrets.ASSUME_ROLE }} --kubeconfig ./kubeconfig
+        
+      - name: Deploy Helm Chart
+        uses: deliverybot/helm@v1
+        with:
+          release: "swagstore"
+          namespace: "swagstore"
+          chart: ./helm-chart
+          value-files: >-
+          [
+            "../../helm-chart/values.yaml"
+          ]
+        env:
+          KUBECONFIG_FILE: ./kubeconfig 

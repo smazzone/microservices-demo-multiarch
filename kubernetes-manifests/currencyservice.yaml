@@ -17,7 +17,7 @@ kind: Deployment
 metadata:
   name: currencyservice
   labels:
-      tags.datadoghq.com/env: "dev-auto-inject"
+      tags.datadoghq.com/env: "dev"
       tags.datadoghq.com/service: "currencyservice"
       tags.datadoghq.com/version: "0.5.0"
 spec:
@@ -28,7 +28,7 @@ spec:
     metadata:
       labels:
         app: currencyservice
-        tags.datadoghq.com/env: "dev-auto-inject"
+        tags.datadoghq.com/env: "dev"
         tags.datadoghq.com/service: "currencyservice"
         tags.datadoghq.com/version: "0.5.0"
         admission.datadoghq.com/enabled: "true"

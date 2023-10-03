@@ -102,6 +102,9 @@ func main() {
 			// profiler.GoroutineProfile,
 		),
 	)
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer profiler.Stop()
 	ctx := context.Background()
 	if os.Getenv("ENABLE_TRACING") == "1" {

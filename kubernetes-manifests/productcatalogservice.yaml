@@ -17,7 +17,7 @@ kind: Deployment
 metadata:
   name: productcatalogservice
   labels:
-    tags.datadoghq.com/env: "dev-auto-inject"
+    tags.datadoghq.com/env: "dev"
     tags.datadoghq.com/service: "productcatalogservice"
     tags.datadoghq.com/version: "0.5.0"
 spec:
@@ -28,7 +28,7 @@ spec:
     metadata:
       labels:
         app: productcatalogservice
-        tags.datadoghq.com/env: "dev-auto-inject"
+        tags.datadoghq.com/env: "dev"
         tags.datadoghq.com/service: "productcatalogservice"
         tags.datadoghq.com/version: "0.5.0"
         admission.datadoghq.com/enabled: "true"

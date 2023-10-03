@@ -17,7 +17,7 @@ kind: Deployment
 metadata:
   name: frontend
   labels:
-    tags.datadoghq.com/env: "dev-auto-inject"
+    tags.datadoghq.com/env: "dev"
     tags.datadoghq.com/service: "frontend"
     tags.datadoghq.com/version: "0.5.0"
 spec:
@@ -28,7 +28,7 @@ spec:
     metadata:
       labels:
         app: frontend
-        tags.datadoghq.com/env: "dev-auto-inject"
+        tags.datadoghq.com/env: "dev"
         tags.datadoghq.com/service: "frontend"
         tags.datadoghq.com/version: "0.5.0"
         admission.datadoghq.com/enabled: "true"
@@ -88,8 +88,8 @@ spec:
             value: "adservice:9555"
           # # ENV_PLATFORM: One of: local, gcp, aws, azure, onprem, alibaba
           # # When not set, defaults to "local" unless running in GKE, otherwies auto-sets to gcp 
-          # - name: ENV_PLATFORM 
-          #   value: "aws"
+          - name: ENV_PLATFORM 
+            value: "aws"
           - name: ENABLE_TRACING
             value: "0"
           - name: ENABLE_PROFILER
