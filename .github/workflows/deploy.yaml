@@ -35,6 +35,9 @@ jobs:
       - name: Create Kubeconfig
         run: aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name workshop-cluster --role-arn ${{ secrets.ASSUME_ROLE }} --kubeconfig ${{ env.KUBECONFIG }}
 
+      - name: Cat Kubeconfig
+        run: cat ./kubeconfig
+
       - name: Helm deploy
         run: helm upgrade --install -f ./helm-chart/values.yaml swagstore ./helm-chart
         env:
