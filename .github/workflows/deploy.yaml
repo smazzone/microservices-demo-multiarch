@@ -33,7 +33,7 @@ jobs:
           version: '3.12.3'
 
       - name: Create Kubeconfig
-        run: aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name workshop-cluster --role-arn ${{ secrets.CLUSTER_ROLE }} --kubeconfig ${{ env.KUBECONFIG }}
+        run: aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name workshop-cluster --kubeconfig ${{ env.KUBECONFIG }}
 
       - name: Helm deploy
         run: helm upgrade --install -f ./helm-chart/values.yaml swagstore ./helm-chart
