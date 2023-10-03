@@ -37,7 +37,7 @@ jobs:
       - name: Helm deploy
         run: helm upgrade --install -f ./helm-chart/values.yaml swagstore ./helm-chart
         env:
-          KUBECONFIG: ./kubeconfig
+          KUBE_CONFIG: ./kubeconfig
       # - name: Deploy Helm Chart
       #   uses: deliverybot/helm@v1
       #   with:
