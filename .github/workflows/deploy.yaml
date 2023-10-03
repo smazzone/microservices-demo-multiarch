@@ -37,8 +37,6 @@ jobs:
 
       - name: setup Kubectl
         uses: azure/setup-kubectl@v3
-        with:
-          version: v1.25
       
       - name: get pods
         run: kubectl get pods -A
