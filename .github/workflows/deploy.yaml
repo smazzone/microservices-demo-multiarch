@@ -32,7 +32,7 @@ jobs:
       - name: Set up Helm
         uses: Azure/setup-helm@v1
         with:
-          version: '3.x'
+          version: '3.12.3'
 
       - name: Helm deploy
         run: helm install --upgrade -f ./helm-chart/values.yaml swagstore ./helm-chart
