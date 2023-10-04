@@ -8,7 +8,7 @@ env:
   GCP_REGION: "us-central-1"
   GCP_PROJECT: microservices-demo-401016
   GCP_SERVICE_ACCOUNT: microservices-demo-svc@microservices-demo-401016.iam.gserviceaccount.com
-  GCP_WORKLOAD_IDENTITY_PROVIDER: "projects/241697928795/locations/global/workloadIdentityPools/microservices-demo-pool/providers/rapdev-io"
+  GCP_WORKLOAD_IDENTITY_PROVIDER: "projects/241697928795/locations/global/workloadIdentityPools/microservices-demo-pool/providers/microservices-demo-provider"
 
 permissions:
   id-token: write
@@ -31,7 +31,7 @@ jobs:
           service_account: "${{ env.GCP_SERVICE_ACCOUNT }}"
 
       - name: Docker auth
-        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
+        run: gcloud auth configure-docker --quiet
       
       - name: Get Creds
         run: gcloud container clusters get-credentials --zone=${{ env.GCP_REGION }}a microservices-demo
