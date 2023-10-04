@@ -26,6 +26,10 @@
 # `gcloud builds submit --config=cloudbuild.yaml --substitutions=_ZONE=us-central1-b,_CLUSTER=demo-app-staging .`
 
 steps:
+- name: "gcr.io/cloud-builders/gcloud"
+  args: ["auth", "configure-docker", "--quiet"]
+  id: "configure-docker-auth"
+
 - id: 'Deploy application to cluster'
   name: 'gcr.io/k8s-skaffold/skaffold:v2.0.3'
   entrypoint: 'bash'
