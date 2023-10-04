@@ -36,8 +36,8 @@ jobs:
       - name: Get Creds
         run: gcloud container clusters get-credentials --zone=us-central1-a microservices-demo
 
+      - name: Install Skaffold
+        run: curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64 && sudo install skaffold /usr/local/bin/
+
       - name: Deploy
-        uses: hiberbee/github-action-skaffold@1.19.0
-        with:
-          command: run -f=skaffold.yaml
-          repository: gcr.io/${{ env.GCP_PROJECT }}
+        run: skaffold run -f=skaffold.yaml --default-repo=gcr.io/${{ env.GCP_PROJECT }}
