@@ -1,0 +1,43 @@
+name: Deploy Swagstore Demo
+on: 
+  push:
+    branches: [main]
+
+env:
+  REPO_NAME: "${{ github.event.repository.name }}"
+  GCP_REGION: "us-central-1"
+  GCP_PROJECT: microservices-demo-401016
+  GCP_SERVICE_ACCOUNT: microservices-demo-svc@microservices-demo-401016.iam.gserviceaccount.com
+  GCP_WORKLOAD_IDENTITY_PROVIDER: "projects/241697928795/locations/global/workloadIdentityPools/microservices-demo-pool/providers/rapdev-io"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: "${{ github.event.pull_request.head.ref }}"
+      
+      - name: Google Cloud Platform Authentication
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          create_credentials_file: "true"
+          workload_identity_provider: "${{ env.GCP_WORKLOAD_IDENTITY_PROVIDER }}"
+          service_account: "${{ env.GCP_SERVICE_ACCOUNT }}"
+
+      - name: Docker auth
+        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
+      
+      - name: Get Creds
+        run: gcloud container clusters get-credentials --zone=${{ env.GCP_REGION }}a microservices-demo
+
+      - name: Deploy
+        uses: hiberbee/github-action-skaffold@1.19.0
+        with:
+          command: run -f=skaffold.yaml
+          repository: gcr.io/${{ env.GCP_PROJECT }}
