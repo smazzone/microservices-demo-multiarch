@@ -57,10 +57,10 @@ spec:
         env:
         - name: PORT
           value: "50051"
-        - name: DISABLE_PROFILER
-          value: "1"
-        - name: DISABLE_DEBUGGER
-          value: "1"
+        # - name: DISABLE_PROFILER
+        #   value: "1"
+        # - name: DISABLE_DEBUGGER
+        #   value: "1"
         - name: DD_LOGS_INJECTION
           value: "true"
         - name: DD_TRACE_SAMPLE_RATE

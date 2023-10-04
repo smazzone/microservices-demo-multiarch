@@ -91,9 +91,9 @@ spec:
           - name: ENV_PLATFORM 
             value: "aws"
           - name: ENABLE_TRACING
-            value: "0"
+            value: "1"
           - name: ENABLE_PROFILER
-            value: "0"
+            value: "1"
           # - name: CYMBAL_BRANDING
           #   value: "true"
           - name: DD_PROFILING_ENABLED
