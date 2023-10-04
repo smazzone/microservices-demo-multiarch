@@ -32,6 +32,9 @@ jobs:
 
       - name: Docker auth
         run: gcloud auth configure-docker --quiet
+
+      - name: Setup GKE Auth
+        run: gcloud components install gke-gcloud-auth-plugin
       
       - name: Get Creds
         run: gcloud container clusters get-credentials --zone=us-central1-a microservices-demo
