@@ -91,7 +91,7 @@ spec:
           - name: ENV_PLATFORM 
             value: "gcp"
           - name: ENABLE_TRACING
-            value: "1"
+            value: "0"
           - name: ENABLE_PROFILER
             value: "1"
           # - name: CYMBAL_BRANDING
