@@ -18,6 +18,10 @@ kind: Deployment
 metadata:
   name: {{ .Values.paymentService.name }}
   namespace: {{ .Release.Namespace }}
+  labels:
+    tags.datadoghq.com/env: {{ .Values.env }}
+    tags.datadoghq.com/service: {{ .Values.paymentService.name }}
+    tags.datadoghq.com/version: {{ .Values.paymentService.version }}
 spec:
   selector:
     matchLabels:
@@ -26,6 +30,12 @@ spec:
     metadata:
       labels:
         app: {{ .Values.paymentService.name }}
+        tags.datadoghq.com/env: {{ .Values.env }}
+        tags.datadoghq.com/service: {{ .Values.paymentService.name }}
+        tags.datadoghq.com/version: {{ .Values.paymentService.version }}
+        admission.datadoghq.com/enabled: "true"
+      annotations:
+        admission.datadoghq.com/js-lib.version: "v3.9.1"
     spec:
       {{- if .Values.serviceAccounts.create }}
       serviceAccountName: {{ .Values.paymentService.name }}

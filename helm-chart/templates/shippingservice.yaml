@@ -18,6 +18,10 @@ kind: Deployment
 metadata:
   name: {{ .Values.shippingService.name }}
   namespace: {{ .Release.Namespace }}
+  labels:
+    tags.datadoghq.com/env: {{ .Values.env }}
+    tags.datadoghq.com/service: {{ .Values.shippingService.name }}
+    tags.datadoghq.com/version: {{ .Values.shippingService.version }}
 spec:
   selector:
     matchLabels:
@@ -26,6 +30,10 @@ spec:
     metadata:
       labels:
         app: {{ .Values.shippingService.name }}
+        tags.datadoghq.com/env: {{ .Values.env }}
+        tags.datadoghq.com/service: {{ .Values.shippingService.name }}
+        tags.datadoghq.com/version: {{ .Values.shippingService.version }}
+        admission.datadoghq.com/enabled: "true"
     spec:
       {{- if .Values.serviceAccounts.create }}
       serviceAccountName: {{ .Values.shippingService.name }}

@@ -18,6 +18,10 @@ kind: Deployment
 metadata:
   name: {{ .Values.productCatalogService.name }}
   namespace: {{ .Release.Namespace }}
+  labels:
+    tags.datadoghq.com/env: {{ .Values.env }}
+    tags.datadoghq.com/service: {{ .Values.productCatalogService.name }}
+    tags.datadoghq.com/version: {{ .Values.productCatalogService.version }}
 spec:
   selector:
     matchLabels:
@@ -26,6 +30,10 @@ spec:
     metadata:
       labels:
         app: {{ .Values.productCatalogService.name }}
+        tags.datadoghq.com/env: {{ .Values.env }}
+        tags.datadoghq.com/service: {{ .Values.productCatalogService.name }}
+        tags.datadoghq.com/version: {{ .Values.productCatalogService.version }}
+        admission.datadoghq.com/enabled: "true"
     spec:
       {{- if .Values.serviceAccounts.create }}
       serviceAccountName: {{ .Values.productCatalogService.name }}

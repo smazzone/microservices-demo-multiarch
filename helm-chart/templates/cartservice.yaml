@@ -16,6 +16,10 @@ kind: Deployment
 metadata:
   name: {{ .Values.cartService.name }}
   namespace: {{ .Release.Namespace }}
+  labels:
+    tags.datadoghq.com/env: {{ .Values.env }}
+    tags.datadoghq.com/service: {{ .Values.cartService.name }}
+    tags.datadoghq.com/version: {{ .Values.cartService.version }}
 spec:
   selector:
     matchLabels:
@@ -30,6 +34,10 @@ spec:
       {{- end }}
       labels:
         app: {{ .Values.cartService.name }}
+        tags.datadoghq.com/env: {{ .Values.env }}
+        tags.datadoghq.com/service: {{ .Values.cartService.name }}
+        tags.datadoghq.com/version: {{ .Values.cartService.version }}
+        admission.datadoghq.com/enabled: "true"
     spec:
       {{- if .Values.serviceAccounts.create }}
       serviceAccountName: {{ .Values.cartService.name }}

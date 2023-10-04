@@ -18,6 +18,10 @@ kind: Deployment
 metadata:
   name: {{ .Values.emailService.name }}
   namespace: {{ .Release.Namespace }}
+  labels:
+    tags.datadoghq.com/env: {{ .Values.env }}
+    tags.datadoghq.com/service: {{ .Values.emailService.name }}
+    tags.datadoghq.com/version: {{ .Values.emailService.version }}
 spec:
   selector:
     matchLabels:
@@ -26,6 +30,12 @@ spec:
     metadata:
       labels:
         app: {{ .Values.emailService.name }}
+        tags.datadoghq.com/env: {{ .Values.env }}
+        tags.datadoghq.com/service: {{ .Values.emailService.name }}
+        tags.datadoghq.com/version: {{ .Values.emailService.version }}
+        admission.datadoghq.com/enabled: "true"
+      annotations:
+        admission.datadoghq.com/python-lib.version: "v1.6.3"
     spec:
       {{- if .Values.serviceAccounts.create }}
       serviceAccountName: {{ .Values.emailService.name }}

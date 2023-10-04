@@ -396,12 +396,12 @@ datadog:
     # datadog.logs.enabled -- Enables this to activate Datadog Agent log collection
 
     ## ref: https://docs.datadoghq.com/agent/basic_agent_usage/kubernetes/#log-collection-setup
-    enabled: false
+    enabled: true
 
     # datadog.logs.containerCollectAll -- Enable this to allow log collection for all containers
 
     ## ref: https://docs.datadoghq.com/agent/basic_agent_usage/kubernetes/#log-collection-setup
-    containerCollectAll: false
+    containerCollectAll: true
 
     # datadog.logs.containerCollectUsingFiles -- Collect logs from files in /var/log/pods instead of using container runtime API
 
@@ -412,7 +412,7 @@ datadog:
     # datadog.logs.autoMultiLineDetection -- Allows the Agent to detect common multi-line patterns automatically.
 
     ## ref: https://docs.datadoghq.com/agent/logs/advanced_log_collection/?tab=configurationfile#automatic-multi-line-aggregation
-    autoMultiLineDetection: false
+    autoMultiLineDetection: true
 
   ## Enable apm agent and provide custom configs
   apm:
@@ -424,7 +424,7 @@ datadog:
     # datadog.apm.portEnabled -- Enable APM over TCP communication (port 8126 by default)
 
     ## ref: https://docs.datadoghq.com/agent/kubernetes/apm/
-    portEnabled: true
+    portEnabled: false
 
     # datadog.apm.enabled -- Enable this to enable APM and tracing, on port 8126
     # DEPRECATED. Use datadog.apm.portEnabled instead
@@ -652,7 +652,7 @@ datadog:
 
   serviceMonitoring:
     # datadog.serviceMonitoring.enabled -- Enable Universal Service Monitoring
-    enabled: true
+    enabled: false
 
   ## Enable security agent and provide custom configs
   securityAgent:

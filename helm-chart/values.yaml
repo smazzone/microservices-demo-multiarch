@@ -46,24 +46,29 @@ seccompProfile:
   type: RuntimeDefault
 
 adService:
-  create: true
+  create: false
   name: adservice
+  version: "0.5.0"
 
 cartService:
   create: true
   name: cartservice
+  version: "0.5.0"
 
 checkoutService:
   create: true
   name: checkoutservice
+  version: "0.5.0"
 
 currencyService:
   create: true
   name: currencyservice
+  version: "0.5.0"
 
 emailService:
   create: true
   name: emailservice
+  version: "0.5.0"
 
 frontend:
   create: true
@@ -73,6 +78,7 @@ frontend:
   # One of: local, gcp, aws, azure, onprem, alibaba. When not set, defaults to "local" unless running in GKE, otherwise auto-sets to gcp.
   platform: aws
   singleSharedSession: false
+  version: "0.5.0"
   virtualService:
     create: false
     hosts:
@@ -87,24 +93,29 @@ loadGenerator:
   create: true
   name: loadgenerator
   checkFrontendInitContainer: true
+  version: "0.5.0"
 
 paymentService:
   create: true
   name: paymentservice
+  version: "0.5.0"
 
 productCatalogService:
   create: true
   name: productcatalogservice
   # Specifies an extra latency to any request on productcatalogservice, by default no extra latency.
   extraLatency: ""
+  version: "0.5.0"
 
 recommendationService:
   create: true
   name: recommendationservice
+  version: "0.5.0"
 
 shippingService:
   create: true
   name: shippingservice
+  version: "0.5.0"
 
 cartDatabase:
   # Specifies the type of the cartservice's database, could be either redis or spanner.
@@ -121,3 +132,5 @@ cartDatabase:
     endpointAddress: ""
     endpointPort: ""
     certificate: ""
+
+env: dev

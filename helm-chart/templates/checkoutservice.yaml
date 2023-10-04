@@ -18,6 +18,10 @@ kind: Deployment
 metadata:
   name: {{ .Values.checkoutService.name }}
   namespace: {{ .Release.Namespace }}
+  labels:
+    tags.datadoghq.com/env: {{ .Values.env }}
+    tags.datadoghq.com/service: {{ .Values.checkoutService.name }}
+    tags.datadoghq.com/version: {{ .Values.checkoutService.version }}
 spec:
   selector:
     matchLabels:
@@ -26,6 +30,10 @@ spec:
     metadata:
       labels:
         app: {{ .Values.checkoutService.name }}
+        tags.datadoghq.com/env: {{ .Values.env }}
+        tags.datadoghq.com/service: {{ .Values.checkoutService.name }}
+        tags.datadoghq.com/version: {{ .Values.checkoutService.version }}
+        admission.datadoghq.com/enabled: "true"
     spec:
       {{- if .Values.serviceAccounts.create }}
       serviceAccountName: {{ .Values.checkoutService.name }}
