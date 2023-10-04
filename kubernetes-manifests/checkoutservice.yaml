@@ -19,7 +19,7 @@ metadata:
   labels:
       tags.datadoghq.com/env: "dev"
       tags.datadoghq.com/service: "checkoutservice"
-      tags.datadoghq.com/version: "0.5.0"
+      tags.datadoghq.com/version: "1.0.0"
 spec:
   selector:
     matchLabels:
@@ -30,7 +30,7 @@ spec:
         app: checkoutservice
         tags.datadoghq.com/env: "dev"
         tags.datadoghq.com/service: "checkoutservice"
-        tags.datadoghq.com/version: "0.5.0"
+        tags.datadoghq.com/version: "1.0.0"
         admission.datadoghq.com/enabled: "true"
     spec:
       serviceAccountName: default

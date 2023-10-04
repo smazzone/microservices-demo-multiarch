@@ -40,4 +40,4 @@ jobs:
         run: curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64 && sudo install skaffold /usr/local/bin/
 
       - name: Deploy
-        run: skaffold run -f=skaffold.yaml --default-repo=gcr.io/${{ env.GCP_PROJECT }}
+        run: skaffold run -f=skaffold.yaml --default-repo=gcr.io/${{ env.GCP_PROJECT }} --platform=linux/amd64
