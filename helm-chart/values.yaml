@@ -110,7 +110,7 @@ productCatalogService:
 recommendationService:
   create: true
   name: recommendationservice
-  version: "0.5.1"
+  version: "0.5.0"
 
 shippingService:
   create: true
