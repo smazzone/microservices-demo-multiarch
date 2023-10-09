@@ -93,7 +93,9 @@ class RecommendationService(demo_pb2_grpc.RecommendationServiceServicer):
 
 if __name__ == "__main__":
     logger.info("initializing recommendationservice")
-
+    while True: #mm
+        logging.error("Stuck in loop") #mm
+      
     try:
       if "DISABLE_PROFILER" in os.environ:
         raise KeyError()
