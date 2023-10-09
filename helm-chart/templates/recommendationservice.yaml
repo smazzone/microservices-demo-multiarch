@@ -61,11 +61,12 @@ spec:
               - all
           privileged: false
           readOnlyRootFilesystem: true
-        {{- if .Values.nativeGrpcHealthCheck }}
-        image: {{ .Values.images.repository }}/{{ .Values.recommendationService.name }}:{{ .Values.images.tag | default .Chart.AppVersion }}-native-grpc-probes
-        {{- else }}
-        image: {{ .Values.images.repository }}/{{ .Values.recommendationService.name }}:{{ .Values.images.tag | default .Chart.AppVersion }}
+        # {{- if .Values.nativeGrpcHealthCheck }}
+        # image: {{ .Values.images.repository }}/{{ .Values.recommendationService.name }}:{{ .Values.images.tag | default .Chart.AppVersion }}-native-grpc-probes
+        # {{- else }}
+        # image: {{ .Values.images.repository }}/{{ .Values.recommendationService.name }}:{{ .Values.images.tag | default .Chart.AppVersion }}
         {{- end }}
+        image: 'public.ecr.aws/i6y1q2i5/otel-demo-recommendationservice:0.9'
         ports:
         - containerPort: 8080
         readinessProbe:
