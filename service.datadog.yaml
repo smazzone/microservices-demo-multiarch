@@ -1,0 +1,90 @@
+---
+schema-version: v2.1
+dd-service: adservice
+team: swagstore
+description: "Service responsible for serving ads in the swagstore application"
+links:
+  - type: repo
+    name: microservices-demo-adservice
+    url: https://github.com/rapdev-io/microservices-demo/src/adservice
+    provider: github
+---
+schema-version: v2.1
+dd-service: cartservice
+team: swagstore
+description: "Service responsible for handling the cart for the swagstore application"
+links:
+  - type: repo
+    name: microservices-demo-cartservice
+    url: https://github.com/rapdev-io/microservices-demo/src/cartservice
+    provider: github
+---
+schema-version: v2.1
+dd-service: checkoutservice
+team: swagstore
+description: "Service responsible for handling checking out your cart the swagstore application"
+links:
+  - type: repo
+    name: microservices-demo-checkoutservice
+    url: https://github.com/rapdev-io/microservices-demo/src/checkoutservice
+    provider: github
+---
+schema-version: v2.1
+dd-service: currencyservice
+team: swagstore
+description: "Service responsible for handling conversion of currency for the swagstore application"
+links:
+  - type: repo
+    name: microservices-demo-currencyservice
+    url: https://github.com/rapdev-io/microservices-demo/src/currencyservice
+    provider: github
+---
+schema-version: v2.1
+dd-service: emailservice
+team: swagstore
+description: "Service responsible for handling emails within the swagstore application"
+links:
+  - type: repo
+    name: microservices-demo-emailservice
+    url: https://github.com/rapdev-io/microservices-demo/src/emailservice
+    provider: github
+---
+schema-version: v2.1
+dd-service: frontend
+team: swagstore
+description: "Service responsible for displaying the UI of the swagstore application"
+links:
+  - type: repo
+    name: microservices-demo-frontend
+    url: https://github.com/rapdev-io/microservices-demo/src/frontend
+    provider: github
+---
+schema-version: v2.1
+dd-service: paymentservice
+team: swagstore
+description: "Service responsible for handling payments within the swagstore application"
+links:
+  - type: repo
+    name: microservices-demo-paymentservice
+    url: https://github.com/rapdev-io/microservices-demo/src/paymentservice
+    provider: github
+---
+schema-version: v2.1
+dd-service: productcatalogservice
+team: swagstore
+description: "Service responsible for maintaining the product catalog of the swagstore application"
+links:
+  - type: repo
+    name: microservices-demo-productcatalogservice
+    url: https://github.com/rapdev-io/microservices-demo/src/productcatalogservice
+    provider: github
+---
+schema-version: v2.1
+dd-service: shippingservice
+team: swagstore
+description: "Service responsible for price quote, tracking IDs, and the impression of order fulfillment & shipping processes of the swagstore application"
+links:
+  - type: repo
+    name: microservices-demo-shippingservice
+    url: https://github.com/rapdev-io/microservices-demo/src/shippingservice
+    provider: github
