@@ -1,6 +1,8 @@
 ---
 schema-version: v2.1
 dd-service: adservice
+application: swagstore
+tier: tier1
 team: swagstore
 description: "Service responsible for serving ads in the swagstore application"
 links:
@@ -8,9 +10,14 @@ links:
     name: microservices-demo-adservice
     url: https://github.com/rapdev-io/microservices-demo/src/adservice
     provider: github
+contacts:
+  - type: slack
+    contact: https://rapdevio.slack.com/archives/C060FRLEN5T
 ---
 schema-version: v2.1
 dd-service: cartservice
+application: swagstore
+tier: tier1
 team: swagstore
 description: "Service responsible for handling the cart for the swagstore application"
 links:
@@ -18,9 +25,14 @@ links:
     name: microservices-demo-cartservice
     url: https://github.com/rapdev-io/microservices-demo/src/cartservice
     provider: github
+contacts:
+  - type: slack
+    contact: https://rapdevio.slack.com/archives/C060FRLEN5T
 ---
 schema-version: v2.1
 dd-service: checkoutservice
+application: swagstore
+tier: tier1
 team: swagstore
 description: "Service responsible for handling checking out your cart the swagstore application"
 links:
@@ -28,9 +40,14 @@ links:
     name: microservices-demo-checkoutservice
     url: https://github.com/rapdev-io/microservices-demo/src/checkoutservice
     provider: github
+contacts:
+  - type: slack
+    contact: https://rapdevio.slack.com/archives/C060FRLEN5T
 ---
 schema-version: v2.1
 dd-service: currencyservice
+application: swagstore
+tier: tier1
 team: swagstore
 description: "Service responsible for handling conversion of currency for the swagstore application"
 links:
@@ -38,9 +55,14 @@ links:
     name: microservices-demo-currencyservice
     url: https://github.com/rapdev-io/microservices-demo/src/currencyservice
     provider: github
+contacts:
+  - type: slack
+    contact: https://rapdevio.slack.com/archives/C060FRLEN5T
 ---
 schema-version: v2.1
 dd-service: emailservice
+application: swagstore
+tier: tier1
 team: swagstore
 description: "Service responsible for handling emails within the swagstore application"
 links:
@@ -48,9 +70,14 @@ links:
     name: microservices-demo-emailservice
     url: https://github.com/rapdev-io/microservices-demo/src/emailservice
     provider: github
+contacts:
+  - type: slack
+    contact: https://rapdevio.slack.com/archives/C060FRLEN5T
 ---
 schema-version: v2.1
 dd-service: frontend
+application: swagstore
+tier: tier1
 team: swagstore
 description: "Service responsible for displaying the UI of the swagstore application"
 links:
@@ -58,9 +85,14 @@ links:
     name: microservices-demo-frontend
     url: https://github.com/rapdev-io/microservices-demo/src/frontend
     provider: github
+contacts:
+  - type: slack
+    contact: https://rapdevio.slack.com/archives/C060FRLEN5T
 ---
 schema-version: v2.1
 dd-service: paymentservice
+application: swagstore
+tier: tier1
 team: swagstore
 description: "Service responsible for handling payments within the swagstore application"
 links:
@@ -68,9 +100,14 @@ links:
     name: microservices-demo-paymentservice
     url: https://github.com/rapdev-io/microservices-demo/src/paymentservice
     provider: github
+contacts:
+  - type: slack
+    contact: https://rapdevio.slack.com/archives/C060FRLEN5T
 ---
 schema-version: v2.1
 dd-service: productcatalogservice
+application: swagstore
+tier: tier1
 team: swagstore
 description: "Service responsible for maintaining the product catalog of the swagstore application"
 links:
@@ -78,9 +115,14 @@ links:
     name: microservices-demo-productcatalogservice
     url: https://github.com/rapdev-io/microservices-demo/src/productcatalogservice
     provider: github
+contacts:
+  - type: slack
+    contact: https://rapdevio.slack.com/archives/C060FRLEN5T
 ---
 schema-version: v2.1
 dd-service: shippingservice
+application: swagstore
+tier: tier1
 team: swagstore
 description: "Service responsible for price quote, tracking IDs, and the impression of order fulfillment & shipping processes of the swagstore application"
 links:
@@ -88,3 +130,6 @@ links:
     name: microservices-demo-shippingservice
     url: https://github.com/rapdev-io/microservices-demo/src/shippingservice
     provider: github
+contacts:
+  - type: slack
+    contact: https://rapdevio.slack.com/archives/C060FRLEN5T
