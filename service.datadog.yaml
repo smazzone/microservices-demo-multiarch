@@ -8,7 +8,7 @@ description: "Service responsible for serving ads in the swagstore application"
 links:
   - type: repo
     name: microservices-demo-adservice
-    url: https://github.com/rapdev-io/microservices-demo/src/adservice
+    url: https://github.com/rapdev-io/microservices-demo/tree/main/src/adservice
     provider: github
 contacts:
   - type: slack
@@ -23,7 +23,22 @@ description: "Service responsible for handling the cart for the swagstore applic
 links:
   - type: repo
     name: microservices-demo-cartservice
-    url: https://github.com/rapdev-io/microservices-demo/src/cartservice
+    url: https://github.com/rapdev-io/microservices-demo/tree/main/src/cartservice
+    provider: github
+contacts:
+  - type: slack
+    contact: https://rapdevio.slack.com/archives/C060FRLEN5T
+---
+schema-version: v2.1
+dd-service: cartservice-redis
+application: swagstore
+tier: tier1
+team: swagstore
+description: "Redis cache for the cart for the swagstore application"
+links:
+  - type: repo
+    name: microservices-demo-cartservice
+    url: https://github.com/rapdev-io/microservices-demo/tree/main/src/cartservice
     provider: github
 contacts:
   - type: slack
@@ -38,7 +53,7 @@ description: "Service responsible for handling checking out your cart the swagst
 links:
   - type: repo
     name: microservices-demo-checkoutservice
-    url: https://github.com/rapdev-io/microservices-demo/src/checkoutservice
+    url: https://github.com/rapdev-io/microservices-demo/tree/main/src/checkoutservice
     provider: github
 contacts:
   - type: slack
@@ -53,7 +68,7 @@ description: "Service responsible for handling conversion of currency for the sw
 links:
   - type: repo
     name: microservices-demo-currencyservice
-    url: https://github.com/rapdev-io/microservices-demo/src/currencyservice
+    url: https://github.com/rapdev-io/microservices-demo/tree/main/src/currencyservice
     provider: github
 contacts:
   - type: slack
@@ -68,7 +83,7 @@ description: "Service responsible for handling emails within the swagstore appli
 links:
   - type: repo
     name: microservices-demo-emailservice
-    url: https://github.com/rapdev-io/microservices-demo/src/emailservice
+    url: https://github.com/rapdev-io/microservices-demo/tree/main/src/emailservice
     provider: github
 contacts:
   - type: slack
@@ -83,7 +98,7 @@ description: "Service responsible for displaying the UI of the swagstore applica
 links:
   - type: repo
     name: microservices-demo-frontend
-    url: https://github.com/rapdev-io/microservices-demo/src/frontend
+    url: https://github.com/rapdev-io/microservices-demo/tree/main/src/frontend
     provider: github
 contacts:
   - type: slack
@@ -98,7 +113,7 @@ description: "Service responsible for handling payments within the swagstore app
 links:
   - type: repo
     name: microservices-demo-paymentservice
-    url: https://github.com/rapdev-io/microservices-demo/src/paymentservice
+    url: https://github.com/rapdev-io/microservices-demo/tree/main/src/paymentservice
     provider: github
 contacts:
   - type: slack
@@ -113,7 +128,7 @@ description: "Service responsible for maintaining the product catalog of the swa
 links:
   - type: repo
     name: microservices-demo-productcatalogservice
-    url: https://github.com/rapdev-io/microservices-demo/src/productcatalogservice
+    url: https://github.com/rapdev-io/microservices-demo/tree/main/src/productcatalogservice
     provider: github
 contacts:
   - type: slack
@@ -128,7 +143,7 @@ description: "Service responsible for price quote, tracking IDs, and the impress
 links:
   - type: repo
     name: microservices-demo-shippingservice
-    url: https://github.com/rapdev-io/microservices-demo/src/shippingservice
+    url: https://github.com/rapdev-io/microservices-demo/tree/main/src/shippingservice
     provider: github
 contacts:
   - type: slack
