@@ -162,6 +162,24 @@ contacts:
     contact: https://rapdevio.slack.com/archives/C060FRLEN5T
 ---
 schema-version: v2.1
+dd-service: recommendationservice
+application: swagstore
+tier: tier1
+team: swagstore
+description: "Service responsible for making recommendations in the swagstore application"
+links:
+  - type: repo
+    name: microservices-demo-recommendationservice
+    url: https://github.com/rapdev-io/microservices-demo/tree/main/src/recommendationservice
+    provider: github
+  - type: dashboard
+    name: SwagStore Dashboard
+    url: https://rapdev-demo.datadoghq.com/dashboard/p9q-62g-jud/swagstore-dashboard?refresh_mode=sliding&tpl_var_env%5B0%5D=dev&tpl_var_service%5B0%5D=recommendationservice&tpl_var_version%5B0%5D=%2A&from_ts=1696963697831&to_ts=1696967297831&live=true
+contacts:
+  - type: slack
+    contact: https://rapdevio.slack.com/archives/C060FRLEN5T
+---
+schema-version: v2.1
 dd-service: shippingservice
 application: swagstore
 tier: tier1
