@@ -1,0 +1,22 @@
+business_applications:
+  - name: Microservices-Demo Application #mandatory 
+    business_owner:
+      name: Eric Ledyard
+      email: eric@rapdev.io #mandatory if include business_owner 
+    tech_owner: 
+      name: Matt Morris
+      email: matt.morris@rapdev.io #mandatory if include tech_owner 
+    support_group: Demo Engineering #mandatory
+  
+
+microservice:
+  name: adservice #mandatory 
+  owned_by: #possible to auto-populate this using Business Application Tech Owner
+    name: Tameem Hourani
+    email: tameem@rapdev.io #mandatory if include owner
+  support_group: Demo Enginering #mandatory
+  application_services: #list out all of the environments for the microservice
+    - environment: Dev #mandatory
+      tags: #list out all of the key/value pairs that the resources for this deployed microservice are tagged with
+        tags.datadoghq.com/env: dev
+        tags.datadoghq.com/service: adservice
