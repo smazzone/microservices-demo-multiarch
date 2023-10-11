@@ -2,7 +2,7 @@ name: Deploy Swagstore Demo
 on: 
   push:
     branches: [main]
-    paths: [src/**, kubernetes-manifests/**]
+    # paths: [src/**, kubernetes-manifests/**]
 
 env:
   REPO_NAME: "${{ github.event.repository.name }}"
