@@ -1,4 +1,4 @@
- business_applications:
+business_applications:
   - name: Microservices-Demo Application #mandatory 
     business_owner:
       name: Jon Giara
