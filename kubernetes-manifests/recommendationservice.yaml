@@ -81,6 +81,12 @@ spec:
           value: "true"
         - name: DD_TRACE_SAMPLE_RATE
           value: "1"
+        - name: HOST_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "http://$(HOST_IP):4317"
         resources:
           requests:
             cpu: 100m
