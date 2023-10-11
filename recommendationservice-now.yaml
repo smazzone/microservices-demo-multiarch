@@ -1,8 +1,8 @@
  business_applications:
   - name: Microservices-Demo Application #mandatory 
     business_owner:
-      name: Eric Ledyard
-      email: eric@rapdev.io #mandatory if include business_owner 
+      name: Jon Giara
+      email: jon@rapdev.io #mandatory if include business_owner 
     tech_owner: 
       name: Matt Morris
       email: matt.morris@rapdev.io #mandatory if include tech_owner 
