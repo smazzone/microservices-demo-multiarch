@@ -87,6 +87,8 @@ spec:
               fieldPath: status.hostIP
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
           value: "http://$(HOST_IP):4317"
+        - name: COLLECTOR_SERVICE_ADDR
+          value: "http://$(HOST_IP):4317"
         resources:
           requests:
             cpu: 100m
