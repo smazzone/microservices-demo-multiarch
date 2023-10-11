@@ -93,8 +93,6 @@ class RecommendationService(demo_pb2_grpc.RecommendationServiceServicer):
 
 if __name__ == "__main__":
     logger.info("initializing recommendationservice")
-    # while True: #mm
-    #   logger.error("Stuck in loop") #mm
       
     try:
       if "DISABLE_PROFILER" in os.environ:
@@ -130,6 +128,11 @@ if __name__ == "__main__":
         raise Exception('PRODUCT_CATALOG_SERVICE_ADDR environment variable not set')
     logger.info("product catalog address: " + catalog_addr)
     channel = grpc.insecure_channel(catalog_addr)
+
+    while True: # Add infinite loop so product catalogs are never retrieved
+      logger.error("Stuck in loop") #mm
+
+
     product_catalog_stub = demo_pb2_grpc.ProductCatalogServiceStub(channel)
 
     # create gRPC server
