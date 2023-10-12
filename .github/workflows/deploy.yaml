@@ -20,8 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
      - name: ServiceNow Change
-        uses: ServiceNow/servicenow-devops-change@v2.0.0
-        with:
+       uses: ServiceNow/servicenow-devops-change@v2.0.0
+       with:
           devops-integration-user-name: ${{ secrets.SN_DEVOPS_USER }}
           devops-integration-user-password: ${{ secrets.SN_DEVOPS_PASSWORD }}
           instance-url: ${{ secrets.SN_INSTANCE_URL }}
@@ -34,36 +34,36 @@ jobs:
           changeCreationTimeOut: '3600'
           abortOnChangeCreationFailure: true
           abortOnChangeStepTimeout: true
-      - run: echo completing
+     - run: echo completing
       
-      - uses: actions/checkout@v3    
-      - uses: actions/checkout@v3
-        with:
+     - uses: actions/checkout@v3    
+     - uses: actions/checkout@v3
+       with:
           ref: "${{ github.event.pull_request.head.ref }}"
       
-      - name: Google Cloud Platform Authentication
-        id: auth
-        uses: google-github-actions/auth@v1
-        with:
+     - name: Google Cloud Platform Authentication
+       id: auth
+       uses: google-github-actions/auth@v1
+       with:
           create_credentials_file: "true"
           workload_identity_provider: "${{ env.GCP_WORKLOAD_IDENTITY_PROVIDER }}"
           service_account: "${{ env.GCP_SERVICE_ACCOUNT }}"
 
-      - name: Docker auth
-        run: gcloud auth configure-docker --quiet
+     - name: Docker auth
+       run: gcloud auth configure-docker --quiet
 
-      - uses: simenandre/setup-gke-gcloud-auth-plugin@v1
+     - uses: simenandre/setup-gke-gcloud-auth-plugin@v1
       
-      - uses: google-github-actions/get-gke-credentials@v1
-        with:
+     - uses: google-github-actions/get-gke-credentials@v1
+       with:
           cluster_name: microservices-demo
           location: us-central1-a
       
-      - name: Get Creds
-        run: gcloud container clusters get-credentials --zone=us-central1-a microservices-demo
+     - name: Get Creds
+       run: gcloud container clusters get-credentials --zone=us-central1-a microservices-demo
 
-      - name: Install Skaffold
-        run: curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64 && sudo install skaffold /usr/local/bin/
+     - name: Install Skaffold
+       run: curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64 && sudo install skaffold /usr/local/bin/
 
-      - name: Deploy
-        run: skaffold run -f=skaffold.yaml --default-repo=gcr.io/${{ env.GCP_PROJECT }} --platform=linux/amd64
+     - name: Deploy
+       run: skaffold run -f=skaffold.yaml --default-repo=gcr.io/${{ env.GCP_PROJECT }} --platform=linux/amd64
