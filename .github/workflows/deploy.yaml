@@ -1,10 +1,15 @@
 name: Deploy Swagstore Demo
+ 
 on: 
   push:
     branches: [main]
     # paths: [src/**, kubernetes-manifests/**]
 
 env:
+  commits: '[{"commitId": "${{ github.sha }}" }]'
+  repository: "${{ github.repository }}"
+  run_number: "${{ github.run_number }}"
+  job: ${{ github.job }}
   REPO_NAME: "${{ github.event.repository.name }}"
   GCP_PROJECT: microservices-demo-401016
   GCP_SERVICE_ACCOUNT: microservices-demo-svc@microservices-demo-401016.iam.gserviceaccount.com
