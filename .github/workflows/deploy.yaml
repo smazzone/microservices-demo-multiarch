@@ -32,7 +32,7 @@ jobs:
          tool-id: ${{ secrets.SN_ORCHESTRATION_TOOL_ID }}
          context-github: ${{ toJSON(github) }}
          job-name: 'build'
-         artifacts: '[{"name": "rapdev_sco_tf", "version": "1.${{env.run_number}}.0", "semanticVersion": "1.${{env.run_number}}.0", "repositoryName": "${{env.repository}}"}]'
+         artifacts: '[{"name": "microservices_demo", "version": "1.${{env.run_number}}.0", "semanticVersion": "1.${{env.run_number}}.0", "repositoryName": "${{env.repository}}"}]'
 
   package:
     name: package
@@ -49,8 +49,8 @@ jobs:
           tool-id: ${{ secrets.SN_ORCHESTRATION_TOOL_ID }}
           context-github: ${{ toJSON(github) }}
           job-name: 'package'
-          artifacts: '[{"name": "rapdev_sco_tf", "version": "1.${{env.run_number}}.0", "semanticVersion": "1.${{env.run_number}}.0", "repositoryName": "${{env.repository}}"}]'
-          package-name: 'rapdev_sco.war'
+          artifacts: '[{"name": "microservices_demo", "version": "1.${{env.run_number}}.0", "semanticVersion": "1.${{env.run_number}}.0", "repositoryName": "${{env.repository}}"}]'
+          package-name: 'microservices_demo.war'
           
   deployment:
     runs-on: ubuntu-latest
