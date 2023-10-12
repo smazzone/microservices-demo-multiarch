@@ -16,8 +16,47 @@ permissions:
   issues: write
 
 jobs:
+  build:
+    name: build
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    environment: Development
+    
+    steps:
+     - name: Register Artifact
+       uses: ServiceNow/servicenow-devops-register-artifact@v1.34.2
+       with:
+         devops-integration-user-name: ${{ secrets.SN_DEVOPS_USER }}
+         devops-integration-user-password: ${{ secrets.SN_DEVOPS_PASSWORD }}
+         instance-url: ${{ secrets.SN_INSTANCE_URL }}
+         tool-id: ${{ secrets.SN_ORCHESTRATION_TOOL_ID }}
+         context-github: ${{ toJSON(github) }}
+         job-name: 'build'
+         artifacts: '[{"name": "rapdev_sco_tf", "version": "1.${{env.run_number}}.0", "semanticVersion": "1.${{env.run_number}}.0", "repositoryName": "${{env.repository}}"}]'
+
+  package:
+    name: package
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+     - name: Register Package
+       uses: ServiceNow/servicenow-devops-register-package@v1.34.2
+       with:
+          devops-integration-user-name: ${{ secrets.SN_DEVOPS_USER }}
+          devops-integration-user-password: ${{ secrets.SN_DEVOPS_PASSWORD }}
+          instance-url: ${{ secrets.SN_INSTANCE_URL }}
+          tool-id: ${{ secrets.SN_ORCHESTRATION_TOOL_ID }}
+          context-github: ${{ toJSON(github) }}
+          job-name: 'package'
+          artifacts: '[{"name": "rapdev_sco_tf", "version": "1.${{env.run_number}}.0", "semanticVersion": "1.${{env.run_number}}.0", "repositoryName": "${{env.repository}}"}]'
+          package-name: 'rapdev_sco.war'
+          
   deployment:
     runs-on: ubuntu-latest
+    name: Prod Deploy
+    environment: Production
+    needs: package
     steps:
      - name: ServiceNow Change
        uses: ServiceNow/servicenow-devops-change@v2.0.0
