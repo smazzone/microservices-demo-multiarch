@@ -19,7 +19,7 @@ metadata:
   labels:
       tags.datadoghq.com/env: "dev"
       tags.datadoghq.com/service: "recommendationservice"
-      tags.datadoghq.com/version: "1.0.0"
+      tags.datadoghq.com/version: "1.0.1"
 spec:
   selector:
     matchLabels:
@@ -30,7 +30,7 @@ spec:
         app: recommendationservice
         tags.datadoghq.com/env: "dev"
         tags.datadoghq.com/service: "recommendationservice"
-        tags.datadoghq.com/version: "1.0.0"
+        tags.datadoghq.com/version: "1.0.1"
         admission.datadoghq.com/enabled: "true"
       annotations:
         admission.datadoghq.com/python-lib.version: "v1.6.3"
