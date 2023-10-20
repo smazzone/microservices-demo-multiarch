@@ -14,7 +14,7 @@ microservice:
   owned_by: #possible to auto-populate this using Business Application Tech Owner
     name: Tameem Hourani
     email: tameem@rapdev.io #mandatory if include owner
-  support_group: Demo Enginering #mandatory
+  support_group: Demo Engineering #mandatory
   application_services: #list out all of the environments for the microservice
     - environment: Dev #mandatory
       tags: #list out all of the key/value pairs that the resources for this deployed microservice are tagged with
