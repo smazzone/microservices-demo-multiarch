@@ -184,7 +184,7 @@ If you would like to contribute features or fixes to this app, see the [Developm
 Welcome to Dash 2023 - Datadog Partner Network Challenge !!
 Your goal will be to capture all the flags related to a micro-service architected application called **Swagstore** using Datadog.
 
-The app consists of an 11-tier microservices application. The application is a web-based e-commerce app where users can browse items, add them to the cart, and purchase them.
+The app consists of an 12-tier microservices application. The application is a web-based e-commerce app where users can browse items, add them to the cart, and purchase them.
 It is a fictitious e-commerce swag store, don't expect to receive swags :grinning:
 
 ## Screenshots
