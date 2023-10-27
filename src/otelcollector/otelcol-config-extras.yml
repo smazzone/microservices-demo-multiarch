@@ -16,3 +16,79 @@
 #    pipelines:
 #      traces:
 #        exporters: [spanmetrics, otlphttp/example]
+mode: daemonset
+
+presets:
+  # enables the k8sattributesprocessor and adds it to the traces, metrics, and logs pipelines
+  kubernetesAttributes:
+    enabled: true
+  # enables the kubeletstatsreceiver and adds it to the metrics pipelines
+  kubeletMetrics:
+    enabled: true
+  # Enables the filelogreceiver and adds it to the logs pipelines
+  logsCollection:
+    enabled: true
+  hostMetrics:
+    enabled: true
+
+config:
+  receivers:
+    otlp:
+      protocols:
+        http:
+    jaeger:
+      protocols:
+        thrift_http:
+          endpoint: "0.0.0.0:14268"    
+    hostmetrics:
+      collection_interval: 30s
+      root_path: /
+      scrapers:
+        disk:
+        filesystem:
+        cpu:
+        load:
+        memory:
+        network:
+        paging:
+        processes:
+
+  processors:
+    batch:
+    resource:
+      attributes:
+      - key: cluster
+        value: ms-demo
+        action: upsert
+      - key: instance_name
+        value: otel-demo
+        action: upsert
+
+  exporters:
+    logging:
+      verbosity: detailed
+      sampling_initial: 5
+      sampling_thereafter: 200    
+    otlp/mm:
+      endpoint: ingest.lightstep.com:443
+      headers:
+        "lightstep-access-token": "Qw9sHy68UKdA3jzi8Q9ZMuEoWpm7JjItOiTWFixJj8k/+aHK59pohCDv/DlQWaYDMRT7NfrYRuvHVY1+BeMAf5oQRdM7EZkNCSVbTCu7"
+    otlp/jvh:
+      endpoint: ingest.lightstep.com:443
+      headers:
+        "lightstep-access-token": "gKT30iCewpr1LQOqhvldPaBAsuzWYwj6xIZ50GKpFx0EHrgCP7Cz5SFtSoyRPAk1XGAjUr1T3tSNGEBzOH8kTMcjJn7E+SAmIt/LcyiP"
+
+  service:
+    pipelines:
+      metrics:
+        receivers: [hostmetrics]
+        processors: [resource]
+        exporters: [otlp/mm,otlp/jvh]
+      logs:
+        receivers: [otlp]
+        processors: []
+        exporters: [logging,otlp/mm,otlp/jvh]
+      traces:
+        receivers: [otlp]
+        processors: []
+        exporters: [logging,otlp/mm,otlp/jvh]
