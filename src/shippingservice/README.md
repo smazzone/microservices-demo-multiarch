@@ -1,23 +1,23 @@
 # Shipping Service
 
-The Shipping service provides price quote, tracking IDs, and the impression of order fulfillment & shipping processes.
+The Shipping service provides price quote, tracking IDs, and the impression of
+order fulfillment & shipping processes.
 
 ## Local
 
-Run the following command to restore dependencies to `vendor/` directory:
-
-    dep ensure --vendor-only
+This repo assumes you have rust 1.61 installed. You may use docker, or install
+rust [here](https://www.rust-lang.org/tools/install).
 
 ## Build
 
-From `src/shippingservice`, run:
+From `../../`, run:
 
-```
-docker build ./
+```sh
+docker compose build shippingservice
 ```
 
 ## Test
 
-```
-go test .
+```sh
+cargo test
 ```

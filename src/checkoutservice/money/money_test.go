@@ -1,17 +1,5 @@
-// Copyright 2018 Google LLC
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 package money
 
 import (
@@ -19,16 +7,16 @@ import (
 	"reflect"
 	"testing"
 
-	pb "github.com/GoogleCloudPlatform/microservices-demo/src/checkoutservice/genproto"
+	pb "github.com/open-telemetry/opentelemetry-demo/src/checkoutservice/genproto/oteldemo"
 )
 
-func mmc(u int64, n int32, c string) pb.Money { return pb.Money{Units: u, Nanos: n, CurrencyCode: c} }
-func mm(u int64, n int32) pb.Money            { return mmc(u, n, "") }
+func mmc(u int64, n int32, c string) *pb.Money { return &pb.Money{Units: u, Nanos: n, CurrencyCode: c} }
+func mm(u int64, n int32) *pb.Money            { return mmc(u, n, "") }
 
 func TestIsValid(t *testing.T) {
 	tests := []struct {
 		name string
-		in   pb.Money
+		in   *pb.Money
 		want bool
 	}{
 		{"valid -/-", mm(-981273891273, -999999999), true},
@@ -52,7 +40,7 @@ func TestIsValid(t *testing.T) {
 func TestIsZero(t *testing.T) {
 	tests := []struct {
 		name string
-		in   pb.Money
+		in   *pb.Money
 		want bool
 	}{
 		{"zero", mm(0, 0), true},
@@ -73,7 +61,7 @@ func TestIsZero(t *testing.T) {
 func TestIsPositive(t *testing.T) {
 	tests := []struct {
 		name string
-		in   pb.Money
+		in   *pb.Money
 		want bool
 	}{
 		{"zero", mm(0, 0), false},
@@ -94,7 +82,7 @@ func TestIsPositive(t *testing.T) {
 func TestIsNegative(t *testing.T) {
 	tests := []struct {
 		name string
-		in   pb.Money
+		in   *pb.Money
 		want bool
 	}{
 		{"zero", mm(0, 0), false},
@@ -114,8 +102,8 @@ func TestIsNegative(t *testing.T) {
 
 func TestAreSameCurrency(t *testing.T) {
 	type args struct {
-		l pb.Money
-		r pb.Money
+		l *pb.Money
+		r *pb.Money
 	}
 	tests := []struct {
 		name string
@@ -139,8 +127,8 @@ func TestAreSameCurrency(t *testing.T) {
 
 func TestAreEquals(t *testing.T) {
 	type args struct {
-		l pb.Money
-		r pb.Money
+		l *pb.Money
+		r *pb.Money
 	}
 	tests := []struct {
 		name string
@@ -165,8 +153,8 @@ func TestAreEquals(t *testing.T) {
 func TestNegate(t *testing.T) {
 	tests := []struct {
 		name string
-		in   pb.Money
-		want pb.Money
+		in   *pb.Money
+		want *pb.Money
 	}{
 		{"zero", mm(0, 0), mm(0, 0)},
 		{"negative", mm(-1, -200), mm(1, 200)},
@@ -201,13 +189,13 @@ func TestMust_panic(t *testing.T) {
 
 func TestSum(t *testing.T) {
 	type args struct {
-		l pb.Money
-		r pb.Money
+		l *pb.Money
+		r *pb.Money
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    pb.Money
+		want    *pb.Money
 		wantErr error
 	}{
 		{"0+0=0", args{mm(0, 0), mm(0, 0)}, mm(0, 0), nil},

@@ -1,50 +1,46 @@
-# Copyright 2020 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
 
-# FROM golang:1.19.4-alpine@sha256:f33331e12ca70192c0dbab2d0a74a52e1dd344221507d88aaea605b0219a212f as builder
-FROM --platform=$BUILDPLATFORM golang:1.19.4-alpine as builder
 
-RUN apk add --no-cache ca-certificates git
-RUN apk add build-base
-WORKDIR /src
+FROM node:18-alpine AS deps
+RUN apk add --no-cache libc6-compat
 
-# restore dependencies
-COPY go.mod go.sum ./
-RUN go mod download
-COPY . .
+WORKDIR /app
 
-ARG TARGETOS 
-ARG TARGETARCH
-RUN echo ${TARGETOS}
-RUN echo ${TARGETARCH}
+COPY ./src/frontend/package*.json ./
+RUN npm ci
 
-# Skaffold passes in debug-oriented compiler flags
-ARG SKAFFOLD_GO_GCFLAGS
-RUN GOOS=$TARGETOS GOARCH=$TARGETARCH go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /go/bin/frontend .
+FROM node:18-alpine AS builder
+RUN apk add --no-cache libc6-compat protobuf-dev protoc
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY ./pb ./pb
+COPY ./src/frontend .
 
-FROM alpine:3.17.0 as release
-RUN apk add --no-cache ca-certificates \
-    busybox-extras net-tools bind-tools
-WORKDIR /src
-COPY --from=builder /go/bin/frontend /src/server
-COPY ./templates ./templates
-COPY ./static ./static
+RUN npm run grpc:generate
+RUN npm run build
 
-# Definition of this variable is used by 'skaffold debug' to identify a golang binary.
-# Default behavior - a failure prints a stack trace for the current goroutine.
-# See https://golang.org/pkg/runtime/
-ENV GOTRACEBACK=single
+FROM node:18-alpine AS runner
+WORKDIR /app
+RUN apk add --no-cache protobuf-dev protoc
 
-EXPOSE 8080
-ENTRYPOINT ["/src/server"]
+ENV NODE_ENV=production
+
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nextjs -u 1001
+
+COPY --from=builder /app/next.config.js ./
+COPY --from=builder /app/utils/telemetry/Instrumentation.js ./
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./package.json
+COPY --from=deps /app/node_modules ./node_modules
+
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
+ENV PORT 8080
+EXPOSE ${PORT}
+
+ENTRYPOINT npm start

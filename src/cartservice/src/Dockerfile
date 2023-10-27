@@ -1,3 +1,5 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
 # Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,101 +14,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:7.0@sha256:81383de6f3bf443625eb277b203f6141f3496fd5a9e1b9b45a4c725266c9d92a AS build
+# https://mcr.microsoft.com/v2/dotnet/sdk/tags/list
+FROM mcr.microsoft.com/dotnet/sdk:6.0.412 AS builder
 
-ARG TARGETPLATFORM
-ARG BUILDOS
-ARG BUILDARCH
-ARG TARGETOS 
-ARG TARGETARCH
-ARG ARCH
-# RUN echo ${TARGETPLATFORM}
-RUN echo ${TARGETOS}
-RUN echo ${TARGETARCH}
+WORKDIR /usr/src/app/
 
-WORKDIR /app
-COPY . .
-RUN dotnet restore cartservice.csproj
-# RUN dotnet build "./cartservice.csproj" -c Debug -o /out
+COPY ./src/cartservice/ ./
+COPY ./pb/ ./src/protos/
 
-RUN if [ "$TARGETARCH" = "amd64" ]; then \
-    RID=linux-x64 ; \
-    elif [ "$TARGETARCH" = "arm64" ]; then \
-    RID=linux-arm64 ; \
-    fi \
-    && dotnet build "./cartservice.csproj" -c Release -r $RID --no-self-contained -o /out
+RUN \
+  RUNTIME_IDENTIIFER=linux-musl-x64; \
+  if [ "$(uname -m)" = "aarch64" ]; then RUNTIME_IDENTIIFER=linux-musl-arm64; fi; \
+  dotnet restore ./src/cartservice.csproj -v d -r $RUNTIME_IDENTIIFER
 
-FROM build AS publish
+RUN \
+  RUNTIME_IDENTIIFER=linux-musl-x64; \
+  if [ "$(uname -m)" = "aarch64" ]; then RUNTIME_IDENTIIFER=linux-musl-arm64; fi; \
+  dotnet publish ./src/cartservice.csproj -v d -p:PublishSingleFile=true -r $RUNTIME_IDENTIIFER --self-contained true -p:PublishTrimmed=False -p:TrimMode=Link -c Release -o /cartservice --no-restore
 
-ARG BUILDOS
-ARG BUILDARCH
-ARG TARGETOS 
-ARG TARGETARCH
-ARG ARCH
-# RUN echo ${BUILDOS}
-# RUN echo ${BUILDARCH}
-RUN echo ${TARGETOS}
-RUN echo ${TARGETARCH}
+# -----------------------------------------------------------------------------
 
-# RUN dotnet publish cartservice.csproj -c Debug -o /out
+# https://mcr.microsoft.com/v2/dotnet/runtime-deps/tags/list
+FROM mcr.microsoft.com/dotnet/runtime-deps:6.0.15-alpine3.16
 
-RUN if [ "$TARGETARCH" = "amd64" ]; then \
-    RID=linux-x64 ; \
-    elif [ "$TARGETARCH" = "arm64" ]; then \
-    RID=linux-arm64 ; \
-    fi \
-    && dotnet publish cartservice.csproj -c Release -r $RID --no-self-contained -o /out
+WORKDIR /usr/src/app/
+COPY --from=builder /cartservice/ ./
 
-# Building final image used in running container
-FROM mcr.microsoft.com/dotnet/aspnet:7.0@sha256:442e00363ed50e17c5104305b658d5d41cf857bbd9d81e9829bc70754169d995 AS final
-
-ARG BUILDOS
-ARG BUILDARCH
-ARG TARGETOS 
-ARG TARGETARCH
-# RUN echo ${BUILDOS}
-# RUN echo ${BUILDARCH}
-RUN echo ${TARGETOS}
-RUN echo ${TARGETARCH}
-
-# Installing procps on the container to enable debugging of .NET Core
-RUN apt-get update \
-    && apt-get install -y unzip procps wget curl
-
-
-# Download and install the Datadog Tracer
-#ENV TRACER_VERSION=2.14.0
-RUN mkdir -p /opt/datadog \
-    && mkdir -p /var/log/datadog \
-    && TRACER_VERSION=$(curl -s https://api.github.com/repos/DataDog/dd-trace-dotnet/releases/latest | grep tag_name | cut -d '"' -f 4 | cut -c2-) \
-    && curl -LO https://github.com/DataDog/dd-trace-dotnet/releases/download/v${TRACER_VERSION}/datadog-dotnet-apm_${TRACER_VERSION}_${TARGETARCH}.deb \
-    && dpkg -i ./datadog-dotnet-apm_${TRACER_VERSION}_${TARGETARCH}.deb \
-    && /opt/datadog/createLogPath.sh \
-    && rm ./datadog-dotnet-apm_${TRACER_VERSION}_${TARGETARCH}.deb
-
-
-# renovate: datasource=github-releases depName=grpc-ecosystem/grpc-health-probe
-# RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
-    # wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
-    # chmod +x /bin/grpc_health_probe
-
-
-
-RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
-    wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${TARGETARCH} && \
-    chmod +x /bin/grpc_health_probe
-
-WORKDIR /app
-COPY --from=publish /out .
-ENV ASPNETCORE_URLS=http://*:7070
-ENV COMPlus_EnableDiagnostics=0
-#Enable the tracer
-ENV CORECLR_ENABLE_PROFILING=1
-ENV CORECLR_PROFILER={846F5F1C-F9AE-4B07-969E-05C26BC060D8}
-ENV CORECLR_PROFILER_PATH=/opt/datadog/Datadog.Trace.ClrProfiler.Native.so
-ENV DD_DOTNET_TRACER_HOME=/opt/datadog
-ENV DD_INTEGRATIONS=/opt/datadog/integrations.json
-ENV LD_PRELOAD=/opt/datadog/continuousprofiler/Datadog.Linux.ApiWrapper.x64.so
-ENV DD_PROFILING_ENABLED=1
-ENV DD_TRACE_DEBUG=0
-ENTRYPOINT ["dotnet", "cartservice.dll"]
+EXPOSE ${CART_SERVICE_PORT}
+ENTRYPOINT [ "./cartservice" ]

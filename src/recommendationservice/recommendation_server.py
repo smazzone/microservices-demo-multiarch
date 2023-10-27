@@ -1,85 +1,54 @@
 #!/usr/bin/python
-#
-# Copyright 2018 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+
+# Python
 import os
 import random
-import time
-import traceback
 from concurrent import futures
 
-# import googlecloudprofiler
-from google.auth.exceptions import DefaultCredentialsError
+# Pip
 import grpc
+from opentelemetry import trace, metrics
+from opentelemetry._logs import set_logger_provider
+from opentelemetry.exporter.otlp.proto.grpc._log_exporter import (
+    OTLPLogExporter,
+)
+from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
+from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
+from opentelemetry.sdk.resources import Resource
 
+# Local
+import logging
 import demo_pb2
 import demo_pb2_grpc
 from grpc_health.v1 import health_pb2
 from grpc_health.v1 import health_pb2_grpc
 
-from opentelemetry import trace
-from opentelemetry.instrumentation.grpc import GrpcInstrumentorServer
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from metrics import (
+    init_metrics
+)
 
-from logger import getJSONLogger
-logger = getJSONLogger('recommendationservice-server')
+cached_ids = []
+first_run = True
 
-def initStackdriverProfiling():
-  project_id = None
-  try:
-    project_id = os.environ["GCP_PROJECT_ID"]
-  except KeyError:
-    # Environment variable not set
-    pass
-
-  for retry in range(1,4):
-    try:
-      if project_id:
-        googlecloudprofiler.start(service='recommendation_server', service_version='1.0.0', verbose=0, project_id=project_id)
-      else:
-        googlecloudprofiler.start(service='recommendation_server', service_version='1.0.0', verbose=0)
-      logger.info("Successfully started Stackdriver Profiler.")
-      return
-    except (BaseException) as exc:
-      logger.info("Unable to start Stackdriver Profiler Python agent. " + str(exc))
-      if (retry < 4):
-        logger.info("Sleeping %d seconds to retry Stackdriver Profiler agent initialization"%(retry*10))
-        time.sleep (1)
-      else:
-        logger.warning("Could not initialize Stackdriver Profiler after retrying, giving up")
-  return
 
 class RecommendationService(demo_pb2_grpc.RecommendationServiceServicer):
     def ListRecommendations(self, request, context):
-        max_responses = 5
-        # fetch list of products from product catalog stub
-        cat_response = product_catalog_stub.ListProducts(demo_pb2.Empty())
-        product_ids = [x.id for x in cat_response.products]
-        filtered_products = list(set(product_ids)-set(request.product_ids))
-        num_products = len(filtered_products)
-        num_return = min(max_responses, num_products)
-        # sample list of indicies to return
-        indices = random.sample(range(num_products), num_return)
-        # fetch product ids from indices
-        prod_list = [filtered_products[i] for i in indices]
-        logger.info("[Recv ListRecommendations] product_ids={}".format(prod_list))
+        prod_list = get_product_list(request.product_ids)
+        span = trace.get_current_span()
+        span.set_attribute("app.products_recommended.count", len(prod_list))
+        logger.info(f"Receive ListRecommendations for product ids:{prod_list}")
+
         # build and return response
         response = demo_pb2.ListRecommendationsResponse()
         response.product_ids.extend(prod_list)
+
+        # Collect metrics for this service
+        rec_svc_metrics["app_recommendations_counter"].add(len(prod_list), {'recommendation.type': 'catalog'})
+
         return response
 
     def Check(self, request, context):
@@ -91,66 +60,115 @@ class RecommendationService(demo_pb2_grpc.RecommendationServiceServicer):
             status=health_pb2.HealthCheckResponse.UNIMPLEMENTED)
 
 
+def get_product_list(request_product_ids):
+    global first_run
+    global cached_ids
+    with tracer.start_as_current_span("get_product_list") as span:
+        max_responses = 5
+
+        # Formulate the list of characters to list of strings
+        request_product_ids_str = ''.join(request_product_ids)
+        request_product_ids = request_product_ids_str.split(',')
+
+        # Feature flag scenario - Cache Leak
+        if check_feature_flag("recommendationCache"):
+            span.set_attribute("app.recommendation.cache_enabled", True)
+            if random.random() < 0.5 or first_run:
+                first_run = False
+                span.set_attribute("app.cache_hit", False)
+                logger.info("get_product_list: cache miss")
+                cat_response = product_catalog_stub.ListProducts(demo_pb2.Empty())
+                response_ids = [x.id for x in cat_response.products]
+                cached_ids = cached_ids + response_ids
+                cached_ids = cached_ids + cached_ids[:len(cached_ids) // 4]
+                product_ids = cached_ids
+            else:
+                span.set_attribute("app.cache_hit", True)
+                logger.info("get_product_list: cache hit")
+                product_ids = cached_ids
+        else:
+            span.set_attribute("app.recommendation.cache_enabled", False)
+            cat_response = product_catalog_stub.ListProducts(demo_pb2.Empty())
+            product_ids = [x.id for x in cat_response.products]
+
+        span.set_attribute("app.products.count", len(product_ids))
+
+        # Create a filtered list of products excluding the products received as input
+        filtered_products = list(set(product_ids) - set(request_product_ids))
+        num_products = len(filtered_products)
+        span.set_attribute("app.filtered_products.count", num_products)
+        num_return = min(max_responses, num_products)
+
+        # Sample list of indicies to return
+        indices = random.sample(range(num_products), num_return)
+        # Fetch product ids from indices
+        prod_list = [filtered_products[i] for i in indices]
+
+        span.set_attribute("app.filtered_products.list", prod_list)
+
+        return prod_list
+
+
+def must_map_env(key: str):
+    value = os.environ.get(key)
+    if value is None:
+        raise Exception(f'{key} environment variable must be set')
+    return value
+
+
+def check_feature_flag(flag_name: str):
+    if feature_flag_stub is None:
+        return False
+    flag = feature_flag_stub.GetFlag(demo_pb2.GetFlagRequest(name=flag_name)).flag
+    return flag.enabled
+
+
 if __name__ == "__main__":
-    logger.info("initializing recommendationservice")
-      
-    try:
-      if "DISABLE_PROFILER" in os.environ:
-        raise KeyError()
-      else:
-        logger.info("Profiler enabled.")
-        initStackdriverProfiling()
-    except KeyError:
-        logger.info("Profiler disabled.")
+    service_name = must_map_env('OTEL_SERVICE_NAME')
 
-    try:
-      if os.environ["ENABLE_TRACING"] == "1":
-        otel_endpoint = os.getenv("COLLECTOR_SERVICE_ADDR", "localhost:4317")
-        trace.set_tracer_provider(TracerProvider())
-        trace.get_tracer_provider().add_span_processor(
-          BatchSpanProcessor(
-              OTLPSpanExporter(
-              endpoint = otel_endpoint,
-              insecure = True
-            )
-          )
-        )
-      grpc_server_instrumentor = GrpcInstrumentorServer()
-      grpc_server_instrumentor.instrument()
-    except (KeyError, DefaultCredentialsError):
-        logger.info("Tracing disabled.")
-    except Exception as e:
-        logger.warn(f"Exception on Cloud Trace setup: {traceback.format_exc()}, tracing disabled.") 
+    # Initialize Traces and Metrics
+    tracer = trace.get_tracer_provider().get_tracer(service_name)
+    meter = metrics.get_meter_provider().get_meter(service_name)
+    rec_svc_metrics = init_metrics(meter)
 
-    port = os.environ.get('PORT', "8080")
-    catalog_addr = os.environ.get('PRODUCT_CATALOG_SERVICE_ADDR', '')
-    if catalog_addr == "":
-        raise Exception('PRODUCT_CATALOG_SERVICE_ADDR environment variable not set')
-    logger.info("product catalog address: " + catalog_addr)
-    channel = grpc.insecure_channel(catalog_addr)
+    # Initialize Logs
+    logger_provider = LoggerProvider(
+        resource=Resource.create(
+            {
+                'service.name': service_name,
+            }
+        ),
+    )
+    set_logger_provider(logger_provider)
+    log_exporter = OTLPLogExporter(insecure=True)
+    logger_provider.add_log_record_processor(BatchLogRecordProcessor(log_exporter))
+    handler = LoggingHandler(level=logging.NOTSET, logger_provider=logger_provider)
 
-    # while True: # Add infinite loop so product catalogs are never retrieved
-        # logger.error("Stuck in loop")
+    # Attach OTLP handler to logger
+    logger = logging.getLogger('main')
+    logger.addHandler(handler)
 
+    catalog_addr = must_map_env('PRODUCT_CATALOG_SERVICE_ADDR')
+    pc_channel = grpc.insecure_channel(catalog_addr)
+    product_catalog_stub = demo_pb2_grpc.ProductCatalogServiceStub(pc_channel)
 
-    product_catalog_stub = demo_pb2_grpc.ProductCatalogServiceStub(channel)
+    ff_addr = os.environ.get('FEATURE_FLAG_GRPC_SERVICE_ADDR')
+    feature_flag_stub = None
+    if ff_addr is not None:
+        ff_channel = grpc.insecure_channel(ff_addr)
+        feature_flag_stub = demo_pb2_grpc.FeatureFlagServiceStub(ff_channel)
 
-    # create gRPC server
+    # Create gRPC server
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
 
-    # add class to gRPC server
+    # Add class to gRPC server
     service = RecommendationService()
     demo_pb2_grpc.add_RecommendationServiceServicer_to_server(service, server)
     health_pb2_grpc.add_HealthServicer_to_server(service, server)
 
-    # start server
-    logger.info("listening on port: " + port)
-    server.add_insecure_port('[::]:'+port)
+    # Start server
+    port = must_map_env('RECOMMENDATION_SERVICE_PORT')
+    server.add_insecure_port(f'[::]:{port}')
     server.start()
-
-    # keep alive
-    try:
-         while True:
-            time.sleep(10000)
-    except KeyboardInterrupt:
-            server.stop(0)
+    logger.info(f'Recommendation service started, listening on port {port}')
+    server.wait_for_termination()

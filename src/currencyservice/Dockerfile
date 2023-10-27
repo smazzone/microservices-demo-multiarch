@@ -1,4 +1,6 @@
-# Copyright 2020 Google LLC
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2023 The OpenTelemetry Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,51 +14,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# FROM node:19.3.0-alpine@sha256:d0b02b1ec5534efb43a926069915c982aec745a8eb0611ebcffc4cafaa4e4a74 as base
+FROM alpine
 
-# FROM base as builder
+RUN apk update
+RUN apk add git cmake make g++ grpc-dev re2-dev protobuf-dev c-ares-dev
 
-FROM --platform=$BUILDPLATFORM node:19.3.0-alpine as base
+ARG OPENTELEMETRY_CPP_VERSION=1.10.0
 
-FROM --platform=$BUILDPLATFORM base as builder
+RUN git clone https://github.com/open-telemetry/opentelemetry-cpp \
+	&& cd opentelemetry-cpp/ \
+    	&& git checkout tags/v${OPENTELEMETRY_CPP_VERSION} -b v${OPENTELEMETRY_CPP_VERSION} \
+	&& mkdir build \
+	&& cd build \
+	&& cmake .. -DCMAKE_CXX_STANDARD=17 -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+				-DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF \
+				-DWITH_EXAMPLES=OFF -DWITH_OTLP_GRPC=ON \
+	&& make -j$(nproc || sysctl -n hw.ncpu || echo 1) install && cd ../.. && rm -rf opentelemetry-cpp
 
-# Some packages (e.g. @google-cloud/profiler) require additional
-# deps for post-install scripts
-RUN apk add --update --no-cache \
-    python3 \
-    make \
-    g++
+COPY . /currencyservice
 
-WORKDIR /usr/src/app
+RUN cd /currencyservice \
+    && mkdir -p build && cd build \
+    && cmake .. \
+    && make -j$(nproc || sysctl -n hw.ncpu || echo 1) install
 
-COPY package*.json ./
-
-RUN npm install --only=production
-
-FROM base as without-grpc-health-probe-bin
-
-WORKDIR /usr/src/app
-
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-
-COPY . .
-
-EXPOSE 7000
-
-ENTRYPOINT [ "node", "server.js" ]
-
-FROM without-grpc-health-probe-bin
-
-# renovate: datasource=github-releases depName=grpc-ecosystem/grpc-health-probe
-# RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
-#     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
-#     chmod +x /bin/grpc_health_probe
-
-ARG TARGETOS 
-ARG TARGETARCH
-RUN echo ${TARGETOS}
-RUN echo ${TARGETARCH}
-
-RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
-    wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${TARGETARCH} && \
-    chmod +x /bin/grpc_health_probe
+EXPOSE ${CURRENCY_SERVICE_PORT}
+ENTRYPOINT ./usr/local/bin/currencyservice ${CURRENCY_SERVICE_PORT}

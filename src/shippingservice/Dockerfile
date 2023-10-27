@@ -1,69 +1,54 @@
-# Copyright 2020 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-# FROM golang:1.19.4-alpine@sha256:f33331e12ca70192c0dbab2d0a74a52e1dd344221507d88aaea605b0219a212f as builder
-FROM --platform=$BUILDPLATFORM golang:1.19.4-alpine as builder
-RUN apk add --no-cache ca-certificates git
-RUN apk add build-base
-WORKDIR /src
-
-# restore dependencies
-COPY go.mod go.sum ./
-RUN go mod download
-COPY . .
-
-# ARG BUILDOS 
-# ARG BUILDARCH
-ARG TARGETOS 
-ARG TARGETARCH
-# RUN echo ${BUILDOS}
-# RUN echo ${BUILDARCH}
-RUN echo ${TARGETOS}
-RUN echo ${TARGETARCH}
-
-# Skaffold passes in debug-oriented compiler flags
-ARG SKAFFOLD_GO_GCFLAGS
-RUN GOOS=$TARGETOS GOARCH=$TARGETARCH go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /go/bin/shippingservice .
-
-FROM alpine:3.17.0@sha256:8914eb54f968791faf6a8638949e480fef81e697984fba772b3976835194c6d4 as without-grpc-health-probe-bin
-RUN apk add --no-cache ca-certificates
-
-WORKDIR /src
-COPY --from=builder /go/bin/shippingservice /src/shippingservice
-ENV APP_PORT=50051
-
-# Definition of this variable is used by 'skaffold debug' to identify a golang binary.
-# Default behavior - a failure prints a stack trace for the current goroutine.
-# See https://golang.org/pkg/runtime/
-ENV GOTRACEBACK=single
-
-EXPOSE 50051
-ENTRYPOINT ["/src/shippingservice"]
-
-FROM without-grpc-health-probe-bin
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
 
 
-ARG TARGETOS 
-ARG TARGETARCH
-RUN echo ${TARGETOS}
-RUN echo ${TARGETARCH}
+FROM --platform=${BUILDPLATFORM} rust:1.69 as builder
 
-# renovate: datasource=github-releases depName=grpc-ecosystem/grpc-health-probe
-# RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
-#     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
-#     chmod +x /bin/grpc_health_probe
+ARG TARGETARCH TARGETPLATFORM BUILDPLATFORM
 
-RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
-    wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${TARGETARCH} && \
+RUN echo Building on ${BUILDPLATFORM} for ${TARGETPLATFORM}
+
+# Check if we are doing cross-compilation, if so we need to add in some more dependencies and run rustup
+RUN if [ "${TARGETPLATFORM}" = "${BUILDPLATFORM}" ] ; then \
+        apt-get update && apt-get install --no-install-recommends -y g++ libc6-dev libprotobuf-dev protobuf-compiler ca-certificates; \
+    elif [ "${TARGETPLATFORM}" = "linux/arm64" ] ; then \
+        apt-get update && apt-get install --no-install-recommends -y g++-aarch64-linux-gnu libc6-dev-arm64-cross libprotobuf-dev protobuf-compiler ca-certificates && \
+        rustup target add aarch64-unknown-linux-gnu && \
+        rustup toolchain install stable-aarch64-unknown-linux-gnu; \
+    else \
+        echo "${TARGETPLATFORM} is not supported"; \
+        exit 1; \
+    fi
+
+WORKDIR /app/
+
+COPY /src/shippingservice/ /app/
+COPY /pb/ /app/proto/
+
+# Compile or crosscompile
+RUN if [ "${TARGETPLATFORM}" = "${BUILDPLATFORM}" ] ; then \
+        cargo build -r --features="dockerproto"; \
+    elif [ "${TARGETPLATFORM}" = "linux/arm64" ] ; then \
+        env CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc \
+            CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc \
+            CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++ \
+        cargo build -r --features="dockerproto" --target aarch64-unknown-linux-gnu && \
+        cp /app/target/aarch64-unknown-linux-gnu/release/shippingservice /app/target/release/shippingservice; \
+    else \
+        echo "${TARGETPLATFORM} is not supported"; \
+        exit 1; \
+    fi
+
+
+ENV GRPC_HEALTH_PROBE_VERSION=v0.4.18
+RUN wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${TARGETARCH} && \
     chmod +x /bin/grpc_health_probe
+
+FROM debian:bullseye-slim as release
+
+WORKDIR /app
+COPY --from=builder /app/target/release/shippingservice /app/shippingservice
+COPY --from=builder /bin/grpc_health_probe /bin/grpc_health_probe
+
+EXPOSE ${SHIPPING_SERVICE_PORT}
+ENTRYPOINT ["/app/shippingservice"]

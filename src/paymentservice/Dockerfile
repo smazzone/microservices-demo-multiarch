@@ -1,62 +1,26 @@
-# Copyright 2020 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
 
-# FROM node:19.3.0-alpine@sha256:d0b02b1ec5534efb43a926069915c982aec745a8eb0611ebcffc4cafaa4e4a74 as base
 
-# FROM base as builder
+FROM node:18-alpine AS build
 
-FROM --platform=$BUILDPLATFORM node:19.3.0-alpine as base
+WORKDIR /usr/src/app/
 
-FROM --platform=$BUILDPLATFORM base as builder
+COPY ./src/paymentservice/package*.json ./
 
-# Some packages (e.g. @google-cloud/profiler) require additional
-# deps for post-install scripts
-RUN apk add --update --no-cache \
-    python3 \
-    make \
-    g++ 
+RUN apk add --no-cache python3 make g++ && npm ci --omit=dev
 
-WORKDIR /usr/src/app
+# -----------------------------------------------------------------------------
 
-COPY package*.json ./
+FROM node:18-alpine
 
-RUN npm install --only=production
+USER node
+WORKDIR /usr/src/app/
+ENV NODE_ENV production
 
-FROM base as without-grpc-health-probe-bin
+COPY --chown=node:node --from=build /usr/src/app/node_modules/ ./node_modules/
+COPY ./src/paymentservice/ ./
+COPY ./pb/demo.proto ./
 
-WORKDIR /usr/src/app
-
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-
-COPY . .
-
-EXPOSE 50051
-
-ENTRYPOINT [ "node", "index.js" ]
-
-FROM without-grpc-health-probe-bin
-
-# renovate: datasource=github-releases depName=grpc-ecosystem/grpc-health-probe
-# RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
-#     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
-#     chmod +x /bin/grpc_health_probe
-
-ARG TARGETOS 
-ARG TARGETARCH
-RUN echo ${TARGETOS}
-RUN echo ${TARGETARCH}
-
-RUN GRPC_HEALTH_PROBE_VERSION=v0.4.14 && \
-    wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${TARGETARCH} && \
-    chmod +x /bin/grpc_health_probe
+EXPOSE ${PAYMENT_SERVICE_PORT}
+ENTRYPOINT [ "npm", "run", "start" ]

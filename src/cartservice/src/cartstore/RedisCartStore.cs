@@ -1,118 +1,210 @@
-// Copyright 2018 Google LLC
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Grpc.Core;
-using Microsoft.Extensions.Caching.Distributed;
+using StackExchange.Redis;
 using Google.Protobuf;
+using Microsoft.Extensions.Logging;
 
-namespace cartservice.cartstore
+namespace cartservice.cartstore;
+
+public class RedisCartStore : ICartStore
 {
-    public class RedisCartStore : ICartStore
-    {
-        private readonly IDistributedCache _cache;
+    private readonly ILogger _logger;
+    private const string CartFieldName = "cart";
+    private const int RedisRetryNumber = 30;
 
-        public RedisCartStore(IDistributedCache cache)
+    private volatile ConnectionMultiplexer _redis;
+    private volatile bool _isRedisConnectionOpened;
+
+    private readonly object _locker = new();
+    private readonly byte[] _emptyCartBytes;
+    private readonly string _connectionString;
+
+    private readonly ConfigurationOptions _redisConnectionOptions;
+
+    public RedisCartStore(ILogger<RedisCartStore> logger, string redisAddress)
+    {
+        _logger = logger;
+        // Serialize empty cart into byte array.
+        var cart = new Oteldemo.Cart();
+        _emptyCartBytes = cart.ToByteArray();
+        _connectionString = $"{redisAddress},ssl=false,allowAdmin=true,abortConnect=false";
+
+        _redisConnectionOptions = ConfigurationOptions.Parse(_connectionString);
+
+        // Try to reconnect multiple times if the first retry fails.
+        _redisConnectionOptions.ConnectRetry = RedisRetryNumber;
+        _redisConnectionOptions.ReconnectRetryPolicy = new ExponentialRetry(1000);
+
+        _redisConnectionOptions.KeepAlive = 180;
+    }
+
+    public ConnectionMultiplexer GetConnection()
+    {
+        EnsureRedisConnected();
+        return _redis;
+    }
+
+    public void Initialize()
+    {
+        EnsureRedisConnected();
+    }
+
+    private void EnsureRedisConnected()
+    {
+        if (_isRedisConnectionOpened)
         {
-            _cache = cache;
+            return;
         }
 
-        public async Task AddItemAsync(string userId, string productId, int quantity)
+        // Connection is closed or failed - open a new one but only at the first thread
+        lock (_locker)
         {
-            Console.WriteLine($"AddItemAsync called with userId={userId}, productId={productId}, quantity={quantity}");
-
-            try
+            if (_isRedisConnectionOpened)
             {
-                Hipstershop.Cart cart;
-                var value = await _cache.GetAsync(userId);
-                if (value == null)
+                return;
+            }
+
+            _logger.LogDebug("Connecting to Redis: {_connectionString}", _connectionString);
+            _redis = ConnectionMultiplexer.Connect(_redisConnectionOptions);
+
+            if (_redis == null || !_redis.IsConnected)
+            {
+                _logger.LogError("Wasn't able to connect to redis");
+
+                // We weren't able to connect to Redis despite some retries with exponential backoff.
+                throw new ApplicationException("Wasn't able to connect to redis");
+            }
+
+            _logger.LogInformation("Successfully connected to Redis");
+            var cache = _redis.GetDatabase();
+
+            _logger.LogDebug("Performing small test");
+            cache.StringSet("cart", "OK" );
+            object res = cache.StringGet("cart");
+            _logger.LogDebug("Small test result: {res}", res);
+
+            _redis.InternalError += (_, e) => { Console.WriteLine(e.Exception); };
+            _redis.ConnectionRestored += (_, _) =>
+            {
+                _isRedisConnectionOpened = true;
+                _logger.LogInformation("Connection to redis was restored successfully.");
+            };
+            _redis.ConnectionFailed += (_, _) =>
+            {
+                _logger.LogInformation("Connection failed. Disposing the object");
+                _isRedisConnectionOpened = false;
+            };
+
+            _isRedisConnectionOpened = true;
+        }
+    }
+
+    public async Task AddItemAsync(string userId, string productId, int quantity)
+    {
+        _logger.LogInformation("AddItemAsync called with userId={userId}, productId={productId}, quantity={quantity}", userId, productId, quantity);
+
+        try
+        {
+            EnsureRedisConnected();
+
+            var db = _redis.GetDatabase();
+
+            // Access the cart from the cache
+            var value = await db.HashGetAsync(userId, CartFieldName);
+
+            Oteldemo.Cart cart;
+            if (value.IsNull)
+            {
+                cart = new Oteldemo.Cart
                 {
-                    cart = new Hipstershop.Cart();
-                    cart.UserId = userId;
-                    cart.Items.Add(new Hipstershop.CartItem { ProductId = productId, Quantity = quantity });
+                    UserId = userId
+                };
+                cart.Items.Add(new Oteldemo.CartItem { ProductId = productId, Quantity = quantity });
+            }
+            else
+            {
+                cart = Oteldemo.Cart.Parser.ParseFrom(value);
+                var existingItem = cart.Items.SingleOrDefault(i => i.ProductId == productId);
+                if (existingItem == null)
+                {
+                    cart.Items.Add(new Oteldemo.CartItem { ProductId = productId, Quantity = quantity });
                 }
                 else
                 {
-                    cart = Hipstershop.Cart.Parser.ParseFrom(value);
-                    var existingItem = cart.Items.SingleOrDefault(i => i.ProductId == productId);
-                    if (existingItem == null)
-                    {
-                        cart.Items.Add(new Hipstershop.CartItem { ProductId = productId, Quantity = quantity });
-                    }
-                    else
-                    {
-                        existingItem.Quantity += quantity;
-                    }
+                    existingItem.Quantity += quantity;
                 }
-                await _cache.SetAsync(userId, cart.ToByteArray());
             }
-            catch (Exception ex)
-            {
-                throw new RpcException(new Status(StatusCode.FailedPrecondition, $"Can't access cart storage. {ex}"));
-            }
+
+            await db.HashSetAsync(userId, new[]{ new HashEntry(CartFieldName, cart.ToByteArray()) });
+            await db.KeyExpireAsync(userId, TimeSpan.FromMinutes(60));
         }
-
-        public async Task EmptyCartAsync(string userId)
+        catch (Exception ex)
         {
-            Console.WriteLine($"EmptyCartAsync called with userId={userId}");
-
-            try
-            {
-                var cart = new Hipstershop.Cart();
-                await _cache.SetAsync(userId, cart.ToByteArray());
-            }
-            catch (Exception ex)
-            {
-                throw new RpcException(new Status(StatusCode.FailedPrecondition, $"Can't access cart storage. {ex}"));
-            }
+            throw new RpcException(new Status(StatusCode.FailedPrecondition, $"Can't access cart storage. {ex}"));
         }
+    }
 
-        public async Task<Hipstershop.Cart> GetCartAsync(string userId)
+    public async Task EmptyCartAsync(string userId)
+    {
+        _logger.LogInformation("EmptyCartAsync called with userId={userId}", userId);
+
+        try
         {
-            Console.WriteLine($"GetCartAsync called with userId={userId}");
+            EnsureRedisConnected();
+            var db = _redis.GetDatabase();
 
-            try
-            {
-                // Access the cart from the cache
-                var value = await _cache.GetAsync(userId);
-
-                if (value != null)
-                {
-                    return Hipstershop.Cart.Parser.ParseFrom(value);
-                }
-
-                // We decided to return empty cart in cases when user wasn't in the cache before
-                return new Hipstershop.Cart();
-            }
-            catch (Exception ex)
-            {
-                throw new RpcException(new Status(StatusCode.FailedPrecondition, $"Can't access cart storage. {ex}"));
-            }
+            // Update the cache with empty cart for given user
+            await db.HashSetAsync(userId, new[] { new HashEntry(CartFieldName, _emptyCartBytes) });
+            await db.KeyExpireAsync(userId, TimeSpan.FromMinutes(60));
         }
-
-        public bool Ping()
+        catch (Exception ex)
         {
-            try
+            throw new RpcException(new Status(StatusCode.FailedPrecondition, $"Can't access cart storage. {ex}"));
+        }
+    }
+
+    public async Task<Oteldemo.Cart> GetCartAsync(string userId)
+    {
+        _logger.LogInformation("GetCartAsync called with userId={userId}", userId);
+
+        try
+        {
+            EnsureRedisConnected();
+
+            var db = _redis.GetDatabase();
+
+            // Access the cart from the cache
+            var value = await db.HashGetAsync(userId, CartFieldName);
+
+            if (!value.IsNull)
             {
-                return true;
+                return Oteldemo.Cart.Parser.ParseFrom(value);
             }
-            catch (Exception)
-            {
-                return false;
-            }
+
+            // We decided to return empty cart in cases when user wasn't in the cache before
+            return new Oteldemo.Cart();
+        }
+        catch (Exception ex)
+        {
+            throw new RpcException(new Status(StatusCode.FailedPrecondition, $"Can't access cart storage. {ex}"));
+        }
+    }
+
+    public bool Ping()
+    {
+        try
+        {
+            var cache = _redis.GetDatabase();
+            var res = cache.Ping();
+            return res != TimeSpan.Zero;
+        }
+        catch (Exception)
+        {
+            return false;
         }
     }
 }

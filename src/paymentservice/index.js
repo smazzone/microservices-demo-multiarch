@@ -1,66 +1,59 @@
-/*
- * Copyright 2018 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+const grpc = require('@grpc/grpc-js')
+const protoLoader = require('@grpc/proto-loader')
+const health = require('grpc-js-health-check')
+const opentelemetry = require('@opentelemetry/api')
 
-'use strict';
+const charge = require('./charge')
+const logger = require('./logger')
 
+function chargeServiceHandler(call, callback) {
+  const span = opentelemetry.trace.getActiveSpan();
 
-if(process.env.DISABLE_PROFILER) {
-  console.log("Profiler disabled.")
-}
-else {
-  console.log("Profiler enabled.")
-  require('@google-cloud/profiler').start({
-    serviceContext: {
-      service: 'paymentservice',
-      version: '1.0.0'
-    }
-  });
-}
+  try {
+    const amount = call.request.amount
+    span.setAttributes({
+      'app.payment.amount': parseFloat(`${amount.units}.${amount.nanos}`)
+    })
+    logger.info({ request: call.request }, "Charge request received.")
 
+    const response = charge.charge(call.request)
+    callback(null, response)
 
-if(process.env.ENABLE_TRACING == "1") {
-  console.log("Tracing enabled.")
-  const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
-  const { SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
-  const { GrpcInstrumentation } = require('@opentelemetry/instrumentation-grpc');
-  const { registerInstrumentations } = require('@opentelemetry/instrumentation');
-  const { OTLPTraceExporter } = require("@opentelemetry/exporter-otlp-grpc");
+  } catch (err) {
+    logger.warn({ err })
 
-  const provider = new NodeTracerProvider();
-  
-  const collectorUrl = process.env.COLLECTOR_SERVICE_ADDR
+    span.recordException(err)
+    span.setStatus({ code: opentelemetry.SpanStatusCode.ERROR })
 
-  provider.addSpanProcessor(new SimpleSpanProcessor(new OTLPTraceExporter({url: collectorUrl})));
-  provider.register();
-
-  registerInstrumentations({
-    instrumentations: [new GrpcInstrumentation()]
-  });
-}
-else {
-  console.log("Tracing disabled.")
+    callback(err)
+  }
 }
 
+async function closeGracefully(signal) {
+  server.forceShutdown()
+  process.kill(process.pid, signal)
+}
 
-const path = require('path');
-const HipsterShopServer = require('./server');
+const otelDemoPackage = grpc.loadPackageDefinition(protoLoader.loadSync('demo.proto'))
+const server = new grpc.Server()
 
-const PORT = process.env['PORT'];
-const PROTO_PATH = path.join(__dirname, '/proto/');
+server.addService(health.service, new health.Implementation({
+  '': health.servingStatus.SERVING
+}))
 
-const server = new HipsterShopServer(PROTO_PATH, PORT);
+server.addService(otelDemoPackage.oteldemo.PaymentService.service, { charge: chargeServiceHandler })
 
-server.listen();
+server.bindAsync(`0.0.0.0:${process.env['PAYMENT_SERVICE_PORT']}`, grpc.ServerCredentials.createInsecure(), (err, port) => {
+  if (err) {
+    return logger.error({ err })
+  }
+
+  logger.info(`PaymentService gRPC server started on port ${port}`)
+  server.start()
+}
+)
+
+process.once('SIGINT', closeGracefully)
+process.once('SIGTERM', closeGracefully)
