@@ -2,8 +2,8 @@ name: Deploy Swagstore Demo
  
 on: 
   push:
-    branches: [main]
-    # paths: [src/**, kubernetes-manifests/**]
+    # branches: [main]
+    paths: [swagstore/**]
 
 env:
   commits: '[{"commitId": "${{ github.sha }}" }]'
