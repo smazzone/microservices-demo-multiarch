@@ -73,4 +73,4 @@ jobs:
      #  run: curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64 && sudo install skaffold /usr/local/bin/
 
      - name: Deploy
-       run: kubectl config set-context --current --namespace=otel-demo && make
+       run: kubectl config set-context --current --namespace=otel-demo && make build && make start
