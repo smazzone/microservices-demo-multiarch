@@ -129,8 +129,8 @@ if __name__ == "__main__":
     logger.info("product catalog address: " + catalog_addr)
     channel = grpc.insecure_channel(catalog_addr)
 
-    while True: # Add infinite loop so product catalogs are never retrieved
-        logger.error("Stuck in loop")
+    # while True: # Add infinite loop so product catalogs are never retrieved
+    #     logger.error("Stuck in loop")
 
 
     product_catalog_stub = demo_pb2_grpc.ProductCatalogServiceStub(channel)
