@@ -36,7 +36,8 @@
 # ENTRYPOINT locust --host="http://${FRONTEND_ADDR}" --headless -u "${USERS:-10}" 2>&1
 
 
-FROM --platform=$BUILDPLATFORM python:3.9.15-slim as base
+# FROM --platform=$BUILDPLATFORM python:3.9.15-slim as base
+FROM --platform=linux/amd64 python:3.9.15-slim as base
 
 FROM base as builder
 
